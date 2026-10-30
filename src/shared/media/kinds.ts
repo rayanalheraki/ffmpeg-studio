@@ -1,3 +1,4 @@
+import { msg } from '../i18n';
 import type { MediaKind } from '../types/media';
 
 export const EXTENSIONS: Record<Exclude<MediaKind, 'unknown'>, readonly string[]> = {
@@ -27,9 +28,9 @@ export function extensionsFor(kinds: readonly MediaKind[]): string[] {
 }
 
 export const KIND_LABELS: Record<MediaKind, string> = {
-  video: 'Video',
-  audio: 'Audio',
-  image: 'Image',
-  subtitle: 'Subtitle',
-  unknown: 'File',
+  video: msg('Video'),
+  audio: msg('Audio'),
+  image: msg('Image'),
+  subtitle: msg('Subtitle'),
+  unknown: msg('File'),
 };

@@ -6,6 +6,7 @@ import { MAIN_SLOT, readyFiles } from '../state/files-reducer';
 import { useSettings } from '../state/settings';
 import { useToasts } from '../state/toasts';
 import type { BatchPreview } from './useBatchPreview';
+import { t, tp } from '@shared/i18n';
 
 /** Sends the current batch to the main process queue. */
 export function useStartBatch(operation: AnyOperation, options: OptionValues, extraArgs: string, preview: BatchPreview) {
@@ -17,7 +18,7 @@ export function useStartBatch(operation: AnyOperation, options: OptionValues, ex
   const start = useCallback(async () => {
     if (starting) return;
     if (preview.problem) {
-      show('warning', 'Not ready yet', preview.problem);
+      show('warning', t('Not ready yet'), preview.problem);
       return;
     }
     setStarting(true);
@@ -34,17 +35,17 @@ export function useStartBatch(operation: AnyOperation, options: OptionValues, ex
         extraArgs,
       });
       const count = result.jobs.length;
-      show('success', `${count} job${count === 1 ? '' : 's'} added to the queue`, operation.label);
+      show('success', tp(count, '{count} job added to the queue', '{count} jobs added to the queue'), t(operation.label));
       if (result.warnings.length > 0) {
         show(
           'warning',
-          `${result.warnings.length} file${result.warnings.length === 1 ? ' was' : 's were'} skipped`,
+          tp(result.warnings.length, '{count} file was skipped', '{count} files were skipped'),
           result.warnings.slice(0, 3).join('\n'),
         );
       }
       if (!settings.queueOpen) update({ queueOpen: true });
     } catch (error) {
-      show('error', 'Could not start', errorMessage(error));
+      show('error', t('Could not start'), errorMessage(error));
     } finally {
       setStarting(false);
     }

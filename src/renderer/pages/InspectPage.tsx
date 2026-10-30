@@ -8,6 +8,7 @@ import { useHotkeys } from '../hooks/useHotkeys';
 import { Icon } from '../lib/Icon';
 import { useFiles } from '../state/files';
 import { MAIN_SLOT } from '../state/files-reducer';
+import { useI18n } from '../state/i18n';
 import styles from './Page.module.css';
 
 /** For `inspect` operations: shows information about each file instead of creating jobs. */
@@ -16,6 +17,7 @@ export function InspectPage({ operation }: { operation: AnyOperation }): React.J
   const { route, browse } = useAddFiles(operation, {});
   const pageDrop = useFileDrop(route);
   useHotkeys({ 'mod+o': () => browse() });
+  const { t } = useI18n();
   const entries = slots[MAIN_SLOT] ?? [];
 
   return (
@@ -26,8 +28,8 @@ export function InspectPage({ operation }: { operation: AnyOperation }): React.J
             <Icon name={operation.icon} size={20} />
           </span>
           <div className={styles.headerText}>
-            <h1 className={styles.title}>{operation.label}</h1>
-            <p className={styles.description}>{operation.description}</p>
+            <h1 className={styles.title}>{t(operation.label)}</h1>
+            <p className={styles.description}>{t(operation.description)}</p>
           </div>
         </header>
         <div className={styles.infoList}>

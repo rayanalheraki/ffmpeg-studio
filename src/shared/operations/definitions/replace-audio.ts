@@ -1,6 +1,7 @@
 import { defineOperation } from '../types';
 import { audioEncoderFor, containerFlags } from '../helpers/encoders';
 import { extraFiles, primaryFile } from '../helpers/streams';
+import { t } from '../../i18n';
 
 type Options = {
   mode: string;
@@ -51,7 +52,7 @@ export default defineOperation<Options>({
   ],
   outputExtension: (_o, file) => file.ext,
   validate: (o, inputs) => {
-    if (o.mode === 'replace' && extraFiles(inputs, 'audio').length === 0) return 'Add an audio file to use as the new soundtrack.';
+    if (o.mode === 'replace' && extraFiles(inputs, 'audio').length === 0) return t('Add an audio file to use as the new soundtrack.');
     return null;
   },
   buildArgs: (o, inputs, ctx) => {

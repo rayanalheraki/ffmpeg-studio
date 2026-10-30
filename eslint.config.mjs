@@ -30,5 +30,10 @@ export default tseslint.config(
     plugins: { 'react-hooks': reactHooks },
     rules: reactHooks.configs.recommended.rules,
   },
+  {
+    // Translation catalogs are flat data and grow with every new string.
+    files: ['src/shared/i18n/locales/**/*.ts'],
+    rules: { 'max-lines': 'off' },
+  },
   prettier,
 );

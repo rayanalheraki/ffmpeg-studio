@@ -4,7 +4,7 @@
   align-items: center;
   gap: var(--space-3);
   padding: var(--space-2);
-  padding-right: var(--space-3);
+  padding-inline-end: var(--space-3);
   border-radius: var(--radius-lg);
   background: var(--surface);
   box-shadow: inset 0 0 0 1px var(--border);
@@ -34,8 +34,7 @@
 .dropAfter::after {
   content: '';
   position: absolute;
-  left: var(--space-2);
-  right: var(--space-2);
+  inset-inline: var(--space-2);
   height: 2px;
   border-radius: var(--radius-full);
   background: var(--accent);
@@ -69,7 +68,7 @@
 .index {
   position: absolute;
   top: 6px;
-  left: 30px;
+  inset-inline-start: 30px;
   z-index: 1;
   display: grid;
   place-items: center;
@@ -113,7 +112,7 @@
 
 .duration {
   position: absolute;
-  right: 4px;
+  inset-inline-end: 4px;
   bottom: 4px;
   padding: 1px 5px;
   border-radius: var(--radius-xs);

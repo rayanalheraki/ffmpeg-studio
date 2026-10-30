@@ -11,6 +11,7 @@ import { Slider } from '../ui/Slider';
 import { Switch } from '../ui/Switch';
 import { TextInput } from '../ui/TextInput';
 import { TimeInput } from '../ui/TimeInput';
+import { useI18n, type I18n } from '../../state/i18n';
 import { DimensionsControl } from './DimensionsControl';
 
 interface FieldControlProps {
@@ -27,9 +28,22 @@ function formatNumber(value: number, unit?: string, precision = 0): string {
   return unit === '%' || unit === 'x' ? `${text}${unit}` : `${text} ${unit}`;
 }
 
+/** Operation definitions are written in English; this returns the field with its texts in the current language. */
+function translateField(field: FieldSchema, t: I18n['t']): FieldSchema {
+  const translated = { ...field, label: t(field.label), description: field.description && t(field.description) };
+  if ('placeholder' in translated && translated.placeholder) translated.placeholder = t(translated.placeholder);
+  if ('unit' in translated && translated.unit) translated.unit = t(translated.unit);
+  if ('choices' in translated) {
+    translated.choices = translated.choices.map((choice) => ({ ...choice, label: t(choice.label), hint: choice.hint && t(choice.hint) }));
+  }
+  return translated;
+}
+
 /** Renders the right custom control for one field of an operation's options schema. */
-export function FieldControl({ field, value, onChange, reference }: FieldControlProps): React.JSX.Element {
+export function FieldControl({ field: source, value, onChange, reference }: FieldControlProps): React.JSX.Element {
   const id = useId();
+  const { t } = useI18n();
+  const field = translateField(source, t);
 
   switch (field.type) {
     case 'toggle':
@@ -84,7 +98,7 @@ export function FieldControl({ field, value, onChange, reference }: FieldControl
       );
     case 'time':
       return (
-        <Field label={field.label} htmlFor={id} description={field.description ?? 'HH:MM:SS, MM:SS or seconds'}>
+        <Field label={field.label} htmlFor={id} description={field.description ?? t('HH:MM:SS, MM:SS or seconds')}>
           <TimeInput id={id} value={String(value)} placeholder={field.placeholder} onChange={onChange} />
         </Field>
       );

@@ -4,6 +4,7 @@ import { useReorder } from '../../hooks/useReorder';
 import type { FileEntry } from '../../state/files-reducer';
 import { Button } from '../ui/Button';
 import { FileCard } from './FileCard';
+import { useI18n } from '../../state/i18n';
 import styles from './FileList.module.css';
 
 interface FileListProps {
@@ -19,23 +20,26 @@ interface FileListProps {
 
 export function FileList({ operation, entries, excluded, onRemove, onMove, onClear, onBrowse }: FileListProps): React.JSX.Element {
   const { itemProps } = useReorder(onMove);
+  const { t } = useI18n();
   const ordered = operation.batch === 'combine';
   const usable = entries.filter(
     (entry) => entry.file && acceptsFile(operation.input.accept, entry.file) && !excluded.has(entry.path),
   ).length;
 
   return (
-    <section className={styles.wrapper} aria-label="Input files">
+    <section className={styles.wrapper} aria-label={t('Input files')}>
       <div className={styles.header}>
         <h2 className={styles.heading}>
-          {operation.input.label ?? 'Files'}
-          <span className={styles.count}>{usable === entries.length ? `${entries.length}` : `${usable} of ${entries.length} usable`}</span>
+          {operation.input.label ? t(operation.input.label) : t('Files')}
+          <span className={styles.count}>
+            {usable === entries.length ? `${entries.length}` : t('{usable} of {total} usable', { usable, total: entries.length })}
+          </span>
         </h2>
         <Button variant="ghost" size="sm" icon="Plus" onClick={onBrowse}>
-          Add
+          {t('Add')}
         </Button>
         <Button variant="ghost" size="sm" icon="Trash" onClick={onClear}>
-          Clear all
+          {t('Clear all')}
         </Button>
       </div>
       <ul className={styles.list}>

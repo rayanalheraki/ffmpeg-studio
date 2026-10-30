@@ -2,6 +2,7 @@ import { defineOperation } from '../types';
 import { audioEncoderFor, containerFlags, videoEncoderArgs } from '../helpers/encoders';
 import { atempoChain, round } from '../helpers/filters';
 import { audioContainer, h264Container, primaryFile } from '../helpers/streams';
+import { t } from '../../i18n';
 
 type Options = {
   speed: number;
@@ -37,9 +38,9 @@ export default defineOperation<Options>({
     return duration == null ? null : duration / o.speed;
   },
   validate: (o, inputs) => {
-    if (Math.abs(o.speed - 1) < 0.001) return 'Choose a speed other than 1x.';
+    if (Math.abs(o.speed - 1) < 0.001) return t('Choose a speed other than 1x.');
     const file = primaryFile(inputs);
-    if (!file.hasVideo && o.audio === 'mute') return 'Removing audio from an audio-only file would leave nothing to export.';
+    if (!file.hasVideo && o.audio === 'mute') return t('Removing audio from an audio-only file would leave nothing to export.');
     return null;
   },
   buildArgs: (o, inputs, ctx) => {

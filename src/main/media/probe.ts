@@ -1,5 +1,6 @@
 import { randomUUID } from 'node:crypto';
 import { stat } from 'node:fs/promises';
+import { t } from '@shared/i18n';
 import { probeArgs } from '@shared/operations/definitions/media-info';
 import type { MediaDetails, MediaFile } from '@shared/types/media';
 import { getBinaries } from '../ffmpeg/binaries';
@@ -59,7 +60,7 @@ export async function probeFile(filePath: string): Promise<MediaFile> {
       () => 0,
     );
     const isMissing = (error as NodeJS.ErrnoException).code === 'ENOENT';
-    return unreadableFile(randomUUID(), filePath, size, isMissing ? 'File not found.' : 'Not a readable media file.');
+    return unreadableFile(randomUUID(), filePath, size, isMissing ? t('File not found.') : t('Not a readable media file.'));
   }
 }
 

@@ -6,6 +6,7 @@ import { errorMessage, studio } from '../lib/api';
 import { useFiles } from '../state/files';
 import { MAIN_SLOT } from '../state/files-reducer';
 import { useToasts } from '../state/toasts';
+import { useI18n } from '../state/i18n';
 
 /**
  * Adding files with as little effort as possible: dropped files the primary
@@ -15,6 +16,7 @@ import { useToasts } from '../state/toasts';
 export function useAddFiles(operation: AnyOperation, options: OptionValues) {
   const { addPaths } = useFiles();
   const { show } = useToasts();
+  const { t, locale } = useI18n();
 
   const route = useCallback(
     (paths: string[]) => {
@@ -40,15 +42,19 @@ export function useAddFiles(operation: AnyOperation, options: OptionValues) {
       const slot = operation.extraSlots?.find((candidate) => candidate.id === slotId);
       const kinds = slot ? slot.accept : operation.input.accept;
       studio.dialog
-        .openFiles({ title: slot ? `Choose ${slot.label.toLowerCase()}` : 'Add files', kinds, multiple: slot ? slot.multiple : true })
+        .openFiles({
+          title: slot ? t('Choose {name}', { name: t(slot.label).toLocaleLowerCase(locale) }) : t('Add files'),
+          kinds,
+          multiple: slot ? slot.multiple : true,
+        })
         .then((paths) => {
           if (paths.length === 0) return;
           if (slot) addPaths(slot.id, slot.multiple ? paths : paths.slice(0, 1), !slot.multiple);
           else route(paths);
         })
-        .catch((error: unknown) => show('error', 'Could not open the file picker', errorMessage(error)));
+        .catch((error: unknown) => show('error', t('Could not open the file picker'), errorMessage(error)));
     },
-    [operation, addPaths, route, show],
+    [operation, addPaths, route, show, t, locale],
   );
 
   return { route, browse };

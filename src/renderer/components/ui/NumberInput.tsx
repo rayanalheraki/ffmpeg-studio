@@ -1,6 +1,7 @@
 import { ChevronDown, ChevronUp } from 'lucide-react';
 import { useDraft } from '../../hooks/useDraft';
 import { cx } from '../../lib/cx';
+import { useI18n } from '../../state/i18n';
 import styles from './Input.module.css';
 
 interface NumberInputProps {
@@ -30,6 +31,7 @@ function roundToStep(value: number, step: number): number {
  */
 export function NumberInput({ id, value, onChange, min, max, step, unit, disabled, ...rest }: NumberInputProps): React.JSX.Element {
   const [draft, setDraft] = useDraft(value, String);
+  const { t } = useI18n();
 
   const commit = (raw: string): void => {
     const parsed = Number(raw);
@@ -77,7 +79,7 @@ export function NumberInput({ id, value, onChange, min, max, step, unit, disable
           type="button"
           className={styles.stepper}
           tabIndex={-1}
-          aria-label="Increase"
+          aria-label={t('Increase')}
           disabled={disabled || value >= max}
           onClick={() => nudge(1)}
         >
@@ -87,7 +89,7 @@ export function NumberInput({ id, value, onChange, min, max, step, unit, disable
           type="button"
           className={styles.stepper}
           tabIndex={-1}
-          aria-label="Decrease"
+          aria-label={t('Decrease')}
           disabled={disabled || value <= min}
           onClick={() => nudge(-1)}
         >

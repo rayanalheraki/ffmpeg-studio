@@ -1,3 +1,5 @@
+import { t } from '../i18n';
+
 export function formatBytes(bytes: number | null | undefined): string {
   if (bytes == null || !Number.isFinite(bytes)) return '—';
   if (bytes < 1024) return `${bytes} B`;
@@ -27,7 +29,7 @@ export function formatMs(ms: number | null | undefined): string {
   const h = Math.floor(total / 3600);
   const m = Math.floor((total % 3600) / 60);
   const s = total % 60;
-  if (h > 0) return `${h}h ${m}m`;
-  if (m > 0) return `${m}m ${String(s).padStart(2, '0')}s`;
-  return `${s}s`;
+  if (h > 0) return t('{h}h {m}m', { h, m });
+  if (m > 0) return t('{m}m {s}s', { m, s: String(s).padStart(2, '0') });
+  return t('{s}s', { s });
 }

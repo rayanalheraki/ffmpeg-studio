@@ -11,7 +11,7 @@
   width: 100%;
   padding: var(--space-3) var(--space-4);
   border-radius: var(--radius-lg);
-  text-align: left;
+  text-align: start;
   font-size: var(--text-md);
   font-weight: var(--weight-medium);
   transition: background-color var(--duration-fast) var(--ease-out);
@@ -28,6 +28,11 @@
 
 .section[data-open='true'] .chevron {
   transform: rotate(90deg);
+}
+
+/* The collapsed chevron points toward the reading direction. */
+.section:dir(rtl):not([data-open='true']) .chevron {
+  transform: scaleX(-1);
 }
 
 .icon {

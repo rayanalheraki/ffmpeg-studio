@@ -1,6 +1,7 @@
 import { defineOperation } from '../types';
 import { even } from '../helpers/filters';
 import { primaryFile, visualEncodeArgs, visualExtension } from '../helpers/streams';
+import { t } from '../../i18n';
 
 type Options = {
   mode: string;
@@ -114,7 +115,7 @@ export default defineOperation<Options>({
     const x = o.center ? 0 : o.x;
     const y = o.center ? 0 : o.y;
     if (o.width + x > file.width || o.height + y > file.height) {
-      return `The crop area is larger than ${file.fileName} (${file.width}×${file.height}).`;
+      return t('The crop area is larger than {file} ({width}×{height}).', { file: file.fileName, width: file.width, height: file.height });
     }
     return null;
   },

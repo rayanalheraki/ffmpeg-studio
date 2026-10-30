@@ -1,6 +1,7 @@
 import { defineOperation } from '../types';
 import { audioEncoderFor, containerFlags } from '../helpers/encoders';
 import { audioContainer, primaryFile } from '../helpers/streams';
+import { t } from '../../i18n';
 
 type Options = {
   mode: string;
@@ -73,8 +74,8 @@ export default defineOperation<Options>({
   ],
   outputExtension: (_o, file) => audioContainer(file),
   validate: (o, inputs) => {
-    if (!primaryFile(inputs).hasAudio) return 'This file has no audio track.';
-    if (o.mode === 'adjust' && o.gain === 0) return 'Choose a gain other than 0 dB.';
+    if (!primaryFile(inputs).hasAudio) return t('This file has no audio track.');
+    if (o.mode === 'adjust' && o.gain === 0) return t('Choose a gain other than 0 dB.');
     return null;
   },
   buildArgs: (o, inputs, ctx) => {

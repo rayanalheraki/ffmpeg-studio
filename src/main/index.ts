@@ -1,6 +1,8 @@
+import { existsSync } from 'node:fs';
 import { dirname } from 'node:path';
 import { BrowserWindow, Notification, app, nativeTheme, session } from 'electron';
 import { APP_NAME } from '@shared/constants';
+import { setLocale, t, tp } from '@shared/i18n';
 import { IPC } from '@shared/ipc';
 import type { JobEvent } from '@shared/types/jobs';
 import type { AppEnvironment } from '@shared/types/settings';
@@ -41,11 +43,11 @@ async function detectFfmpegVersion(): Promise<void> {
 function notifyBatch(summary: BatchSummary, enabled: boolean): void {
   const total = summary.completed + summary.failed + summary.cancelled;
   if (!enabled || total === 0 || !Notification.isSupported()) return;
-  const parts = [`${summary.completed} completed`];
-  if (summary.failed > 0) parts.push(`${summary.failed} failed`);
-  if (summary.cancelled > 0) parts.push(`${summary.cancelled} cancelled or skipped`);
+  const parts = [tp(summary.completed, '{count} completed', '{count} completed')];
+  if (summary.failed > 0) parts.push(tp(summary.failed, '{count} failed', '{count} failed'));
+  if (summary.cancelled > 0) parts.push(tp(summary.cancelled, '{count} cancelled or skipped', '{count} cancelled or skipped'));
   new Notification({
-    title: summary.failed > 0 ? 'Batch finished with errors' : 'All jobs finished',
+    title: summary.failed > 0 ? t('Batch finished with errors') : t('All jobs finished'),
     body: parts.join(' · '),
     silent: false,
   }).show();
@@ -59,14 +61,15 @@ function hardenSessions(): void {
 
 function bootstrap(): void {
   const settings = new SettingsStore();
+  setLocale(settings.get().language);
   const queue = new JobQueue(
     {
       emit: (event: JobEvent) => send(IPC.jobsEvent, event),
       onBatchFinished: (summary) => notifyBatch(summary, settings.get().notifyOnFinish),
       resolveBinary: () => getBinaries().ffmpeg,
       describeOutput: async (filePath) => {
+        if (!existsSync(filePath)) return null;
         const file = await probeFile(filePath);
-        if (file.probeError === 'File not found.') return null;
         return { fileName: file.fileName, size: file.size, ext: file.ext, width: file.width, height: file.height };
       },
     },

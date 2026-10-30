@@ -1,4 +1,5 @@
 import type { Settings } from './types/settings';
+import { DEFAULT_LOCALE } from './i18n';
 import { DEFAULT_NAMING_PATTERN } from './jobs/output';
 import { DEFAULT_OPERATION_ID } from './operations/registry';
 
@@ -15,6 +16,7 @@ export const MAX_PRESETS_PER_OPERATION = 50;
 
 export const DEFAULT_SETTINGS: Settings = {
   theme: 'system',
+  language: DEFAULT_LOCALE,
   concurrency: DEFAULT_CONCURRENCY,
   output: { directory: null, pattern: DEFAULT_NAMING_PATTERN, overwrite: 'rename' },
   lastOutputDirectory: null,

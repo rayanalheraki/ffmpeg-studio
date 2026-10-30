@@ -1,5 +1,6 @@
 import { useRef, type KeyboardEvent } from 'react';
 import type { Choice } from '@shared/operations/types';
+import { useI18n } from '../../state/i18n';
 import styles from './Toggle.module.css';
 
 interface SegmentedControlProps {
@@ -16,10 +17,13 @@ interface SegmentedControlProps {
 export function SegmentedControl({ id, value, choices, onChange, showHint = true, ...rest }: SegmentedControlProps): React.JSX.Element {
   const refs = useRef<(HTMLButtonElement | null)[]>([]);
   const selected = choices.find((choice) => choice.value === value);
+  const { dir } = useI18n();
+  // Left/right follow the visual order, which is reversed in right-to-left layouts.
+  const forward = dir === 'rtl' ? 'ArrowLeft' : 'ArrowRight';
+  const backward = dir === 'rtl' ? 'ArrowRight' : 'ArrowLeft';
 
   const onKeyDown = (event: KeyboardEvent, index: number): void => {
-    const delta =
-      event.key === 'ArrowRight' || event.key === 'ArrowDown' ? 1 : event.key === 'ArrowLeft' || event.key === 'ArrowUp' ? -1 : 0;
+    const delta = event.key === forward || event.key === 'ArrowDown' ? 1 : event.key === backward || event.key === 'ArrowUp' ? -1 : 0;
     if (delta === 0) return;
     event.preventDefault();
     const next = (index + delta + choices.length) % choices.length;

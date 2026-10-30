@@ -1,6 +1,7 @@
 import { defineOperation } from '../types';
 import { AUDIO_BITRATE_CHOICES, audioEncoderFor, containerFlags } from '../helpers/encoders';
 import { primaryFile } from '../helpers/streams';
+import { t } from '../../i18n';
 
 type Options = {
   format: string;
@@ -62,7 +63,7 @@ export default defineOperation<Options>({
     },
   ],
   outputExtension: (o, file) => (o.format === 'original' ? copyExtension(file.audioCodec) : (FORMAT_EXTENSIONS[o.format] ?? 'mp3')),
-  validate: (_o, inputs) => (primaryFile(inputs).hasAudio ? null : 'This file has no audio track.'),
+  validate: (_o, inputs) => (primaryFile(inputs).hasAudio ? null : t('This file has no audio track.')),
   buildArgs: (o, inputs, ctx) => {
     const file = primaryFile(inputs);
     const args = ['-i', file.path, '-vn', '-sn', '-map', '0:a:0'];

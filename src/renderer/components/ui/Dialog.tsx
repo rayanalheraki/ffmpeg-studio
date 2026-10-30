@@ -1,6 +1,7 @@
 import { X } from 'lucide-react';
 import { useEffect, useRef, type ReactNode } from 'react';
 import { createPortal } from 'react-dom';
+import { useI18n } from '../../state/i18n';
 import styles from './Dialog.module.css';
 
 interface DialogProps {
@@ -14,6 +15,7 @@ interface DialogProps {
 
 /** Modal dialog: Escape and the backdrop close it, focus returns to the opener. */
 export function Dialog({ open, title, description, onClose, children, footer }: DialogProps): React.JSX.Element | null {
+  const { t } = useI18n();
   const panelRef = useRef<HTMLDivElement>(null);
   const closeRef = useRef(onClose);
 
@@ -50,7 +52,7 @@ export function Dialog({ open, title, description, onClose, children, footer }: 
             </h2>
             {description && <p className={styles.description}>{description}</p>}
           </div>
-          <button type="button" className={styles.close} aria-label="Close dialog" onClick={onClose}>
+          <button type="button" className={styles.close} aria-label={t('Close dialog')} onClick={onClose}>
             <X size={16} />
           </button>
         </header>

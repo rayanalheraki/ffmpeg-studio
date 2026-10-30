@@ -1,6 +1,7 @@
 import { parseTime, toFfmpegTime } from '../../utils/time';
 import { defineOperation } from '../types';
 import { primaryFile } from '../helpers/streams';
+import { t } from '../../i18n';
 
 type Options = {
   fps: number;
@@ -71,9 +72,9 @@ export default defineOperation<Options>({
   },
   validate: (o, inputs) => {
     const start = parseTime(o.start);
-    if (o.start.trim() !== '' && start == null) return 'Start time is not a valid timestamp.';
+    if (o.start.trim() !== '' && start == null) return t('Start time is not a valid timestamp.');
     const total = primaryFile(inputs).duration;
-    if (start != null && total != null && start >= total) return 'Start time is beyond the end of the video.';
+    if (start != null && total != null && start >= total) return t('Start time is beyond the end of the video.');
     return null;
   },
   buildArgs: (o, inputs, ctx) => {

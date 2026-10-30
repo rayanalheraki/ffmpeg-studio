@@ -2,6 +2,7 @@ import { createContext, useCallback, useContext, useEffect, useMemo, useState, t
 import type { JobEvent, JobSnapshot, JobStatus } from '@shared/types/jobs';
 import { errorMessage, studio } from '../lib/api';
 import { useToasts } from './toasts';
+import { t } from '@shared/i18n';
 
 type Counts = Record<JobStatus, number>;
 
@@ -33,7 +34,7 @@ export function JobsProvider({ children }: { children: ReactNode }): React.JSX.E
     studio.jobs
       .list()
       .then((list) => setJobs((current) => (current.length === 0 ? list : current)))
-      .catch((error: unknown) => show('error', 'Could not load the job queue', errorMessage(error)));
+      .catch((error: unknown) => show('error', t('Could not load the job queue'), errorMessage(error)));
     return unsubscribe;
   }, [show]);
 

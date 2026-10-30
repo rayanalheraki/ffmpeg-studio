@@ -12,6 +12,7 @@ import {
   videoEncoderArgs,
 } from '../helpers/encoders';
 import { primaryFile } from '../helpers/streams';
+import { t } from '../../i18n';
 
 type Options = {
   codec: string;
@@ -87,8 +88,8 @@ export default defineOperation<Options>({
   validate: (o, inputs) => {
     const container = resolveContainer(o, primaryFile(inputs));
     const codec = asCodec(o.codec);
-    if (container === 'webm' && (codec === 'h264' || codec === 'h265')) return 'WebM only supports the VP9 and AV1 codecs.';
-    if (container === 'mov' && (codec === 'vp9' || codec === 'av1')) return 'MOV does not support VP9 or AV1. Choose MP4 or MKV.';
+    if (container === 'webm' && (codec === 'h264' || codec === 'h265')) return t('WebM only supports the VP9 and AV1 codecs.');
+    if (container === 'mov' && (codec === 'vp9' || codec === 'av1')) return t('MOV does not support VP9 or AV1. Choose MP4 or MKV.');
     return null;
   },
   buildArgs: (o, inputs, ctx) => {

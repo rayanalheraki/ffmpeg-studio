@@ -21,6 +21,8 @@ export const TextInput = forwardRef<HTMLInputElement, TextInputProps>(function T
       <input
         ref={ref}
         className={cx(styles.input, mono && styles.mono)}
+        // Commands and file name patterns read left to right in every language.
+        dir={mono ? 'ltr' : undefined}
         value={value}
         disabled={disabled}
         aria-invalid={invalid || undefined}

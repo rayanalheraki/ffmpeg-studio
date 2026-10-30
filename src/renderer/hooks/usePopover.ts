@@ -1,5 +1,8 @@
 import { useCallback, useEffect, useLayoutEffect, useRef, useState, type CSSProperties } from 'react';
 
+/** Marks every floating panel so nested popovers can recognize each other. */
+const FLOATING_ATTR = 'data-floating';
+
 interface PopoverOptions {
   /** Match the trigger width (dropdowns) or size to content (menus). */
   matchWidth?: boolean;
@@ -47,7 +50,9 @@ export function usePopover<T extends HTMLElement, P extends HTMLElement>(options
     };
     if (flip) next.bottom = window.innerHeight - rect.top + offset;
     else next.top = rect.bottom + offset;
-    if (align === 'end') next.right = Math.max(8, window.innerWidth - rect.right);
+    // `start`/`end` are logical: in right-to-left layouts `start` is the trigger's right edge.
+    const alignRight = (align === 'end') !== (document.documentElement.dir === 'rtl');
+    if (alignRight) next.right = Math.max(8, window.innerWidth - rect.right);
     else next.left = Math.min(rect.left, window.innerWidth - (matchWidth ? rect.width : 220) - 8);
     setStyle(next);
   }, [align, matchWidth, maxHeight, offset]);
@@ -61,6 +66,10 @@ export function usePopover<T extends HTMLElement, P extends HTMLElement>(options
     const onPointer = (event: PointerEvent): void => {
       const target = event.target as Node;
       if (panelRef.current?.contains(target) || triggerRef.current?.contains(target)) return;
+      // Panels render in portals, so a dropdown opened from inside this panel (e.g. the
+      // language Select in Preferences) is outside it in the DOM. Closing here would
+      // unmount that dropdown before its option receives the click.
+      if (target instanceof Element && target.closest(`[${FLOATING_ATTR}]`)) return;
       setOpen(false);
     };
     const onKey = (event: KeyboardEvent): void => {
@@ -89,6 +98,7 @@ export function usePopover<T extends HTMLElement, P extends HTMLElement>(options
     triggerRef.current = element;
   }, []);
   const setPanel = useCallback((element: P | null) => {
+    element?.setAttribute(FLOATING_ATTR, '');
     panelRef.current = element;
   }, []);
   const focusTrigger = useCallback(() => triggerRef.current?.focus(), []);

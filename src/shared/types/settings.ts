@@ -1,3 +1,4 @@
+import type { Locale } from '../i18n/types';
 import type { OptionValues } from '../operations/types';
 import type { OutputSettings } from './jobs';
 
@@ -13,6 +14,7 @@ export interface Preset {
 
 export interface Settings {
   theme: ThemePreference;
+  language: Locale;
   concurrency: number;
   output: OutputSettings;
   /** Last folder chosen in the output folder picker. */

@@ -1,5 +1,6 @@
 import { defineOperation } from '../types';
 import { extraFiles, primaryFile } from '../helpers/streams';
+import { t } from '../../i18n';
 
 type Options = {
   title: string;
@@ -58,10 +59,11 @@ export default defineOperation<Options>({
   validate: (o, inputs) => {
     const file = primaryFile(inputs);
     const cover = extraFiles(inputs, 'cover')[0];
-    if (cover && !COVER_FORMATS.includes(file.ext)) return `Cover art is not supported for .${file.ext} files. Use MP3, M4A or FLAC.`;
-    if (o.year.trim() !== '' && !/^\d{4}(-\d{2}(-\d{2})?)?$/.test(o.year.trim())) return 'Year must look like 2024 or 2024-05-01.';
+    if (cover && !COVER_FORMATS.includes(file.ext))
+      return t('Cover art is not supported for .{ext} files. Use MP3, M4A or FLAC.', { ext: file.ext });
+    if (o.year.trim() !== '' && !/^\d{4}(-\d{2}(-\d{2})?)?$/.test(o.year.trim())) return t('Year must look like 2024 or 2024-05-01.');
     const hasTag = TAG_KEYS.some((key) => o[key].trim() !== '');
-    return hasTag || cover || o.clearExisting ? null : 'Enter at least one field, add cover art, or clear existing metadata.';
+    return hasTag || cover || o.clearExisting ? null : t('Enter at least one field, add cover art, or clear existing metadata.');
   },
   buildArgs: (o, inputs, ctx) => {
     const file = primaryFile(inputs);

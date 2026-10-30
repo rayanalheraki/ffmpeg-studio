@@ -2,6 +2,7 @@ import type { MediaFile } from '../../types/media';
 import { defineOperation, type Anchor } from '../types';
 import { drawtextPosition, escapeFilterPath, escapeFilterValue, even, ffmpegColor, overlayPosition, round } from '../helpers/filters';
 import { extraFiles, primaryFile, visualEncodeArgs, visualExtension } from '../helpers/streams';
+import { t } from '../../i18n';
 
 type Options = {
   type: string;
@@ -100,8 +101,8 @@ export default defineOperation<Options>({
   ],
   outputExtension: (_o, file) => visualExtension(file),
   validate: (o, inputs) => {
-    if (o.type === 'text' && o.text.trim() === '') return 'Enter the watermark text.';
-    if (o.type === 'image' && extraFiles(inputs, 'image').length === 0) return 'Add a watermark image.';
+    if (o.type === 'text' && o.text.trim() === '') return t('Enter the watermark text.');
+    if (o.type === 'image' && extraFiles(inputs, 'image').length === 0) return t('Add a watermark image.');
     return null;
   },
   buildArgs: (o, inputs, ctx) => {

@@ -1,7 +1,8 @@
 import { Pipette } from 'lucide-react';
 import { useDraft } from '../../hooks/useDraft';
-import styles from './Pickers.module.css';
 import { TextInput } from './TextInput';
+import { useI18n } from '../../state/i18n';
+import styles from './Pickers.module.css';
 
 const PRESETS = ['#ffffff', '#000000', '#f5b544', '#f2626b', '#3dd68c', '#5eb4ff', '#7d6dff'];
 
@@ -14,8 +15,9 @@ interface ColorInputProps {
 /** Swatch palette, a custom color picker and a hex field. */
 export function ColorInput({ id, value, onChange }: ColorInputProps): React.JSX.Element {
   const [draft, setDraft] = useDraft(value, (v) => v);
+  const { t } = useI18n();
   return (
-    <div className={styles.color} role="radiogroup" aria-label="Color">
+    <div className={styles.color} role="radiogroup" aria-label={t('Color')}>
       {PRESETS.map((color) => (
         <button
           key={color}
@@ -28,9 +30,9 @@ export function ColorInput({ id, value, onChange }: ColorInputProps): React.JSX.
           onClick={() => onChange(color)}
         />
       ))}
-      <label className={`${styles.swatch} ${styles.customSwatch}`} title="Pick a custom color">
+      <label className={`${styles.swatch} ${styles.customSwatch}`} title={t('Pick a custom color')}>
         <Pipette size={12} strokeWidth={2.25} aria-hidden="true" />
-        <input type="color" value={value} aria-label="Custom color" onChange={(event) => onChange(event.target.value)} />
+        <input type="color" value={value} aria-label={t('Custom color')} onChange={(event) => onChange(event.target.value)} />
       </label>
       <TextInput
         id={id}

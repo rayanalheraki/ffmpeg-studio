@@ -1,5 +1,6 @@
 import { defineOperation } from '../types';
 import { primaryFile, visualEncodeArgs, visualExtension } from '../helpers/streams';
+import { t } from '../../i18n';
 
 type Options = {
   rotation: string;
@@ -45,7 +46,7 @@ export default defineOperation<Options>({
     { key: 'flipVertical', type: 'toggle', label: 'Flip vertically', description: 'Mirror top and bottom.', default: false },
   ],
   outputExtension: (_o, file) => visualExtension(file),
-  validate: (o) => (rotateFilters(o).length === 0 ? 'Choose a rotation or a flip direction.' : null),
+  validate: (o) => (rotateFilters(o).length === 0 ? t('Choose a rotation or a flip direction.') : null),
   buildArgs: (o, inputs, ctx) => {
     const file = primaryFile(inputs);
     return ['-i', file.path, '-vf', rotateFilters(o).join(','), ...visualEncodeArgs(file), ctx.output];

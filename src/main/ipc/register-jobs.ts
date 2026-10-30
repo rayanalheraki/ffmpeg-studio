@@ -1,3 +1,4 @@
+import { setLocale } from '@shared/i18n';
 import { IPC } from '@shared/ipc';
 import type { StartBatchResult } from '@shared/types/jobs';
 import type { SettingsStore } from '../settings/settings-store';
@@ -33,6 +34,7 @@ export function registerJobsIpc({ queue, settings }: JobsDeps): void {
   handle(IPC.settingsUpdate, (patch) => {
     const next = settings.update(patch);
     queue.setConcurrency(next.concurrency);
+    setLocale(next.language);
     return next;
   });
   handle(IPC.presetsSave, (operationId, name, options) => settings.savePreset(operationId, name, options));

@@ -1,3 +1,5 @@
+import { t } from '../i18n';
+
 /** Flags added to every FFmpeg job. Overwrite is resolved beforehand, so `-y` is always safe. */
 export const GLOBAL_ARGS: readonly string[] = ['-hide_banner', '-nostdin', '-y'];
 
@@ -51,7 +53,8 @@ export function splitArgs(input: string): SplitResult {
     }
   }
 
-  if (quote) return { args: [], error: `Missing closing ${quote === '"' ? 'double' : 'single'} quote in extra arguments.` };
+  if (quote === '"') return { args: [], error: t('Missing closing double quote in extra arguments.') };
+  if (quote) return { args: [], error: t('Missing closing single quote in extra arguments.') };
   if (hasToken) args.push(current);
   return { args, error: null };
 }

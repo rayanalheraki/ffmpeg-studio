@@ -42,7 +42,7 @@
   content: '';
   position: absolute;
   top: 2px;
-  left: 2px;
+  inset-inline-start: 2px;
   width: 16px;
   height: 16px;
   border-radius: 50%;
@@ -58,6 +58,10 @@
 
 .switch[aria-checked='true']::after {
   transform: translateX(14px);
+}
+
+.switch:dir(rtl)[aria-checked='true']::after {
+  transform: translateX(-14px);
 }
 
 .switch:disabled {

@@ -1,8 +1,22 @@
 import type { KeyboardEvent } from 'react';
 import type { Anchor } from '@shared/operations/types';
+import { msg } from '@shared/i18n';
+import { useI18n } from '../../state/i18n';
 import styles from './Pickers.module.css';
 
 const GRID: Anchor[] = ['top-left', 'top', 'top-right', 'left', 'center', 'right', 'bottom-left', 'bottom', 'bottom-right'];
+
+const LABELS: Record<Anchor, string> = {
+  'top-left': msg('top left'),
+  top: msg('top'),
+  'top-right': msg('top right'),
+  left: msg('left'),
+  center: msg('center'),
+  right: msg('right'),
+  'bottom-left': msg('bottom left'),
+  bottom: msg('bottom'),
+  'bottom-right': msg('bottom right'),
+};
 
 interface AnchorPickerProps {
   value: Anchor;
@@ -11,6 +25,7 @@ interface AnchorPickerProps {
 
 /** 3×3 position picker shaped like a video frame; arrow keys move the selection. */
 export function AnchorPicker({ value, onChange }: AnchorPickerProps): React.JSX.Element {
+  const { t } = useI18n();
   const index = GRID.indexOf(value);
 
   const onKeyDown = (event: KeyboardEvent): void => {
@@ -25,21 +40,22 @@ export function AnchorPicker({ value, onChange }: AnchorPickerProps): React.JSX.
 
   return (
     <div className={styles.anchorRow}>
-      <div className={styles.anchors} role="radiogroup" aria-label="Position" onKeyDown={onKeyDown}>
+      {/* The grid mirrors the video frame, so it keeps its physical layout in right-to-left languages. */}
+      <div className={styles.anchors} role="radiogroup" aria-label={t('Position')} dir="ltr" onKeyDown={onKeyDown}>
         {GRID.map((anchor) => (
           <button
             key={anchor}
             type="button"
             role="radio"
             aria-checked={anchor === value}
-            aria-label={anchor.replace('-', ' ')}
+            aria-label={t(LABELS[anchor])}
             tabIndex={anchor === value ? 0 : -1}
             className={styles.anchor}
             onClick={() => onChange(anchor)}
           />
         ))}
       </div>
-      <span className={styles.anchorLabel}>{value.replace('-', ' ')}</span>
+      <span className={styles.anchorLabel}>{t(LABELS[value])}</span>
     </div>
   );
 }

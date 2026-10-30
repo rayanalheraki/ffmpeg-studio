@@ -1,6 +1,7 @@
 import { parseTime, toFfmpegTime } from '../../utils/time';
 import { defineOperation } from '../types';
 import { primaryFile } from '../helpers/streams';
+import { t } from '../../i18n';
 
 type Options = {
   mode: string;
@@ -90,9 +91,9 @@ export default defineOperation<Options>({
   validate: (o, inputs) => {
     if (o.mode !== 'timestamp') return null;
     const time = parseTime(o.timestamp);
-    if (time == null) return 'Enter a valid timestamp, such as 00:01:30.';
+    if (time == null) return t('Enter a valid timestamp, such as 00:01:30.');
     const duration = primaryFile(inputs).duration;
-    if (duration != null && time >= duration) return 'The timestamp is beyond the end of the video.';
+    if (duration != null && time >= duration) return t('The timestamp is beyond the end of the video.');
     return null;
   },
   buildArgs: (o, inputs, ctx) => {

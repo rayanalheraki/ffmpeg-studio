@@ -3,6 +3,7 @@ import { defineOperation } from '../types';
 import { containerFlags, videoEncoderArgs } from '../helpers/encoders';
 import { escapeFilterPath, escapeFilterValue } from '../helpers/filters';
 import { audioCopyOrEncode, extraFiles, h264Container, primaryFile } from '../helpers/streams';
+import { t } from '../../i18n';
 
 type Options = {
   mode: string;
@@ -109,9 +110,9 @@ export default defineOperation<Options>({
   ],
   outputExtension: (o, file) => (o.mode === 'burn' ? h264Container(file) : softContainer(file)),
   validate: (o, inputs) => {
-    if (extraFiles(inputs, 'subtitles').length === 0) return 'Add at least one subtitle file.';
+    if (extraFiles(inputs, 'subtitles').length === 0) return t('Add at least one subtitle file.');
     if (o.mode === 'soft' && o.language.trim() !== '' && !/^[a-zA-Z]{2,3}$/.test(o.language.trim())) {
-      return 'Language must be a 2 or 3 letter code, like eng.';
+      return t('Language must be a 2 or 3 letter code, like eng.');
     }
     return null;
   },

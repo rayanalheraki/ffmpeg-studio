@@ -1,15 +1,16 @@
 import type { OutputSettings } from '../types/jobs';
 import type { AnyOperation, JobInputs, OptionValues } from '../operations/types';
 import { dirname, joinPath } from '../utils/path';
+import { msg } from '../i18n';
 
 export const DEFAULT_NAMING_PATTERN = '{name}_{op}';
 
 export const NAMING_TOKENS: readonly { token: string; description: string }[] = [
-  { token: '{name}', description: 'Source file name without extension' },
-  { token: '{op}', description: 'Short operation label, e.g. converted' },
-  { token: '{ext}', description: 'Source file extension' },
-  { token: '{index}', description: 'Position of the file in the batch (1, 2, 3…)' },
-  { token: '{date}', description: 'Today’s date, e.g. 2024-05-01' },
+  { token: '{name}', description: msg('Source file name without extension') },
+  { token: '{op}', description: msg('Short operation label, e.g. converted') },
+  { token: '{ext}', description: msg('Source file extension') },
+  { token: '{index}', description: msg('Position of the file in the batch (1, 2, 3…)') },
+  { token: '{date}', description: msg('Today’s date, e.g. 2024-05-01') },
 ];
 
 /** Characters that are invalid in file names on at least one desktop platform. */

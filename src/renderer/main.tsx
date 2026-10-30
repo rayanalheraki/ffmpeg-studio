@@ -3,6 +3,7 @@ import { createRoot } from 'react-dom/client';
 import { App } from './App';
 import { ErrorBoundary } from './components/layout/ErrorBoundary';
 import { FilesProvider } from './state/files';
+import { I18nProvider } from './state/i18n';
 import { JobsProvider } from './state/jobs';
 import { SettingsProvider } from './state/settings';
 import { ToastProvider } from './state/toasts';
@@ -16,11 +17,13 @@ createRoot(container).render(
     <ErrorBoundary>
       <ToastProvider>
         <SettingsProvider>
-          <JobsProvider>
-            <FilesProvider>
-              <App />
-            </FilesProvider>
-          </JobsProvider>
+          <I18nProvider>
+            <JobsProvider>
+              <FilesProvider>
+                <App />
+              </FilesProvider>
+            </JobsProvider>
+          </I18nProvider>
         </SettingsProvider>
       </ToastProvider>
     </ErrorBoundary>

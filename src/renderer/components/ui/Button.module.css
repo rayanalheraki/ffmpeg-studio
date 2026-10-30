@@ -112,7 +112,7 @@
 }
 
 .kbd {
-  margin-left: var(--space-1);
+  margin-inline-start: var(--space-1);
   padding: 1px 5px;
   border-radius: var(--radius-xs);
   background: rgb(255 255 255 / 0.16);

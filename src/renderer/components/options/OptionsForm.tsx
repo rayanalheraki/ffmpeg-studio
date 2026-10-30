@@ -3,6 +3,7 @@ import { isFieldVisible } from '@shared/operations/schema';
 import type { MediaFile } from '@shared/types/media';
 import { cx } from '../../lib/cx';
 import { FieldControl } from './FieldControl';
+import { useI18n } from '../../state/i18n';
 import styles from './Options.module.css';
 
 interface OptionsFormProps {
@@ -14,10 +15,11 @@ interface OptionsFormProps {
 
 /** A form generated from the operation's declarative options schema. */
 export function OptionsForm({ operation, options, reference, onChange }: OptionsFormProps): React.JSX.Element {
+  const { t } = useI18n();
   const fields = operation.options.filter((field) => isFieldVisible(field, options));
   const set = (key: string, value: OptionValue): void => onChange({ ...options, [key]: value });
 
-  if (fields.length === 0) return <p className={styles.noOptions}>This operation has no settings. Just press Start.</p>;
+  if (fields.length === 0) return <p className={styles.noOptions}>{t('This operation has no settings. Just press Start.')}</p>;
 
   return (
     <div className={styles.grid}>

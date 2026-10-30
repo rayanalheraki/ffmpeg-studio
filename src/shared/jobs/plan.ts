@@ -1,5 +1,6 @@
 import type { MediaFile } from '../types/media';
 import type { AnyOperation, ExtraSlot, JobInputs, OptionValues } from '../operations/types';
+import { t, tp } from '../i18n';
 
 export interface PlanResult {
   jobs: JobInputs[];
@@ -45,7 +46,9 @@ export function planJobs(
 
   if (usable.length < minFiles) {
     const error =
-      usable.length === 0 ? 'Add at least one supported file to get started.' : `This operation needs at least ${minFiles} files.`;
+      usable.length === 0
+        ? t('Add at least one supported file to get started.')
+        : tp(minFiles, 'This operation needs at least {count} file.', 'This operation needs at least {count} files.');
     return { jobs: [], skipped, error };
   }
 
@@ -55,13 +58,17 @@ export function planJobs(
   for (const slot of slots) {
     const files = (extra[slot.id] ?? []).filter((file) => acceptsFile(slot.accept, file));
     if (files.length === 0 && isSlotRequired(slot, options)) {
-      return { jobs: [], skipped, error: `Add a file to “${slot.label}”.` };
+      return { jobs: [], skipped, error: t('Add a file to “{slot}”.', { slot: t(slot.label) }) };
     }
     if (slot.distribution === 'paired' && files.length > 1 && files.length !== groups.length) {
       return {
         jobs: [],
         skipped,
-        error: `“${slot.label}” has ${files.length} files for ${groups.length} jobs. Add one file for all jobs, or exactly one per job.`,
+        error: t('“{slot}” has {files} files for {jobs} jobs. Add one file for all jobs, or exactly one per job.', {
+          slot: t(slot.label),
+          files: files.length,
+          jobs: groups.length,
+        }),
       };
     }
   }

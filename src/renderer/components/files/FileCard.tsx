@@ -7,6 +7,7 @@ import type { FileEntry } from '../../state/files-reducer';
 import { IconButton } from '../ui/Button';
 import { Badge, Skeleton } from '../ui/Feedback';
 import { FileThumbnail } from './FileThumbnail';
+import { useI18n } from '../../state/i18n';
 import styles from './FileCard.module.css';
 
 export interface CardDragProps {
@@ -32,6 +33,7 @@ interface FileCardProps {
 
 function FileCardComponent({ entry, position, supported, unsupportedReason, onRemove, onMove, drag }: FileCardProps): React.JSX.Element {
   const { file } = entry;
+  const { t } = useI18n();
   const onKeyDown = (event: KeyboardEvent): void => {
     if (event.altKey && (event.key === 'ArrowUp' || event.key === 'ArrowDown')) {
       event.preventDefault();
@@ -61,7 +63,11 @@ function FileCardComponent({ entry, position, supported, unsupportedReason, onRe
         drag.dropPosition === 'after' && styles.dropAfter,
       )}
       tabIndex={0}
-      aria-label={`${entry.path}${position ? `, position ${position}` : ''}. Alt+Arrow keys to reorder, Delete to remove.`}
+      aria-label={
+        position
+          ? t('{path}, position {position}. Alt+Arrow keys to reorder, Delete to remove.', { path: entry.path, position })
+          : t('{path}. Alt+Arrow keys to reorder, Delete to remove.', { path: entry.path })
+      }
       draggable={drag.draggable}
       onDragStart={drag.onDragStart}
       onDragOver={drag.onDragOver}
@@ -77,11 +83,11 @@ function FileCardComponent({ entry, position, supported, unsupportedReason, onRe
       <div className={styles.body}>
         {file ? (
           <>
-            <p className={styles.name} title={file.path}>
+            <p className={styles.name} title={file.path} dir="auto">
               {file.fileName}
             </p>
             <div className={styles.meta}>
-              <Badge tone={supported ? 'neutral' : 'warning'}>{file.ext.toUpperCase() || KIND_LABELS[file.kind]}</Badge>
+              <Badge tone={supported ? 'neutral' : 'warning'}>{file.ext.toUpperCase() || t(KIND_LABELS[file.kind])}</Badge>
               {meta.map((item, index) => (
                 <Fragment key={`${item}-${index}`}>
                   {index > 0 && <span className={styles.dot} />}
@@ -92,7 +98,7 @@ function FileCardComponent({ entry, position, supported, unsupportedReason, onRe
             {!supported && (
               <div className={styles.meta}>
                 <Badge tone="warning" icon="TriangleAlert">
-                  {file.probeError ?? unsupportedReason ?? 'Not used by this operation'}
+                  {file.probeError ?? unsupportedReason ?? t('Not used by this operation')}
                 </Badge>
               </div>
             )}
@@ -105,9 +111,9 @@ function FileCardComponent({ entry, position, supported, unsupportedReason, onRe
         )}
       </div>
       <div className={styles.actions}>
-        <IconButton icon="ArrowUp" label="Move up" onClick={() => onMove(-1)} />
-        <IconButton icon="ArrowDown" label="Move down" onClick={() => onMove(1)} />
-        <IconButton icon="X" label="Remove file" tone="danger" onClick={onRemove} />
+        <IconButton icon="ArrowUp" label={t('Move up')} onClick={() => onMove(-1)} />
+        <IconButton icon="ArrowDown" label={t('Move down')} onClick={() => onMove(1)} />
+        <IconButton icon="X" label={t('Remove file')} tone="danger" onClick={onRemove} />
       </div>
     </li>
   );

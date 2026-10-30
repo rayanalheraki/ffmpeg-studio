@@ -119,6 +119,10 @@ declared with `extraSlots` (see `watermark.ts` or `replace-audio.ts`).
 Then add a test in `tests/operations/` (the registry test already checks that defaults produce well-formed arguments),
 and optionally a case in `tests/integration/ffmpeg.test.ts` to run it through the real FFmpeg.
 
+Write labels, descriptions and choices in English; the UI translates them at render time. Add the Arabic and Turkish
+versions to `src/shared/i18n/locales/{ar,tr}/operations.ts` (`tests/core/i18n.test.ts` lists anything missing).
+Messages returned from `validate` go through `t()` from `src/shared/i18n`.
+
 ## Keyboard shortcuts
 
 | Shortcut              | Action                          |

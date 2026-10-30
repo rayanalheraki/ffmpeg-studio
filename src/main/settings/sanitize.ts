@@ -1,5 +1,6 @@
 import { isAbsolute } from 'node:path';
 import { DEFAULT_SETTINGS, MAX_CONCURRENCY, MIN_CONCURRENCY } from '@shared/constants';
+import { isLocale } from '@shared/i18n';
 import { getOperation } from '@shared/operations/registry';
 import { normalizeOptions } from '@shared/operations/schema';
 import type { OptionValues } from '@shared/operations/types';
@@ -55,6 +56,7 @@ export function sanitizePatch(value: unknown): SettingsPatch {
   const raw = asRecord(value);
   const patch: SettingsPatch = {};
   if (THEMES.includes(raw.theme as ThemePreference)) patch.theme = raw.theme as ThemePreference;
+  if (isLocale(raw.language)) patch.language = raw.language;
   if (typeof raw.concurrency === 'number' && Number.isFinite(raw.concurrency)) {
     patch.concurrency = Math.min(MAX_CONCURRENCY, Math.max(MIN_CONCURRENCY, Math.round(raw.concurrency)));
   }

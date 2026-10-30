@@ -1,5 +1,6 @@
 import { defineOperation } from '../types';
 import { primaryFile } from '../helpers/streams';
+import { t, tp } from '../../i18n';
 
 type Options = {
   track: number;
@@ -45,8 +46,9 @@ export default defineOperation<Options>({
   outputExtension: (o) => (CODECS[o.format] ? o.format : 'srt'),
   validate: (o, inputs) => {
     const file = primaryFile(inputs);
-    if (file.subtitleStreams === 0) return 'This file has no subtitle tracks.';
-    if (o.track >= file.subtitleStreams) return `This file only has ${file.subtitleStreams} subtitle track(s).`;
+    if (file.subtitleStreams === 0) return t('This file has no subtitle tracks.');
+    if (o.track >= file.subtitleStreams)
+      return tp(file.subtitleStreams, 'This file only has {count} subtitle track.', 'This file only has {count} subtitle tracks.');
     return null;
   },
   buildArgs: (o, inputs, ctx) => {

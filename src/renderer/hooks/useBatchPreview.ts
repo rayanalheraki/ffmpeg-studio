@@ -7,6 +7,7 @@ import type { MediaFile } from '@shared/types/media';
 import { useFiles } from '../state/files';
 import { MAIN_SLOT, readyFiles } from '../state/files-reducer';
 import { useSettings } from '../state/settings';
+import { useI18n } from '../state/i18n';
 
 export interface BatchPreview {
   /** Jobs that will actually run. */
@@ -26,6 +27,7 @@ export interface BatchPreview {
 export function useBatchPreview(operation: AnyOperation, options: OptionValues, extraArgs: string): BatchPreview {
   const { slots } = useFiles();
   const { settings, environment } = useSettings();
+  const { t } = useI18n();
 
   return useMemo(() => {
     const slotIds = [MAIN_SLOT, ...(operation.extraSlots ?? []).map((slot) => slot.id)];
@@ -46,7 +48,7 @@ export function useBatchPreview(operation: AnyOperation, options: OptionValues, 
 
     const split = splitArgs(extraArgs);
     let problem = plan.error ?? split.error ?? batchProblem ?? (runnable.length === 0 && excluded[0] ? excluded[0].reason : null);
-    if (probing && !problem) problem = 'Reading files…';
+    if (probing && !problem) problem = t('Reading files…');
 
     let command: string | null = null;
     let outputPath: string | null = null;
@@ -58,10 +60,10 @@ export function useBatchPreview(operation: AnyOperation, options: OptionValues, 
         command = formatCommand(['ffmpeg', ...args], environment.platform);
       } catch (error) {
         console.error('Could not build the command preview', error);
-        problem = 'These settings cannot be turned into an FFmpeg command.';
+        problem = t('These settings cannot be turned into an FFmpeg command.');
       }
     }
 
     return { jobCount: runnable.length, unsupported: plan.skipped, excluded, problem, command, outputPath, probing };
-  }, [operation, options, extraArgs, slots, settings.output, environment]);
+  }, [operation, options, extraArgs, slots, settings.output, environment, t]);
 }

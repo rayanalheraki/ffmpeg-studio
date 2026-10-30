@@ -1,6 +1,7 @@
 import { Component, type ErrorInfo, type ReactNode } from 'react';
 import { Button } from '../ui/Button';
 import { EmptyState } from '../ui/Feedback';
+import { t } from '@shared/i18n';
 
 interface State {
   error: Error | null;
@@ -24,10 +25,10 @@ export class ErrorBoundary extends Component<{ children: ReactNode }, State> {
       <div style={{ display: 'grid', placeItems: 'center', height: '100%' }}>
         <EmptyState
           icon="TriangleAlert"
-          title="Something went wrong"
+          title={t('Something went wrong')}
           action={
             <Button variant="primary" icon="RotateCcw" onClick={() => window.location.reload()}>
-              Reload window
+              {t('Reload window')}
             </Button>
           }
         >

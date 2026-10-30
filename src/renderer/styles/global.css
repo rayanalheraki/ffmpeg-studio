@@ -1,10 +1,33 @@
 @import '@fontsource-variable/inter';
+@import '@fontsource-variable/cairo';
 @import './tokens.css';
 
 *,
 *::before,
 *::after {
   box-sizing: border-box;
+}
+
+/* Arabic uses Cairo (bundled, covers Arabic and Latin) so the interface reads as one typeface.
+   Arabic is never tracked, since letter-spacing breaks the joins between its letters. */
+:root:lang(ar) {
+  --font-sans: 'Cairo Variable', 'Segoe UI', Tahoma, system-ui, sans-serif;
+}
+
+:root:lang(ar) body {
+  /* Inter's stylistic sets would select unrelated alternates in Cairo. */
+  font-feature-settings: normal;
+}
+
+/* Monospace fonts have no Arabic glyphs; translated placeholders in code-style fields use Cairo. */
+:root:lang(ar) input::placeholder {
+  font-family: var(--font-sans);
+}
+
+:root:lang(ar) *,
+:root:lang(ar) *::before,
+:root:lang(ar) *::after {
+  letter-spacing: 0 !important;
 }
 
 html,

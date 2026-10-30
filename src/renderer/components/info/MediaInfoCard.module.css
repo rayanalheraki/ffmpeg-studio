@@ -50,11 +50,11 @@
 
 .stat {
   padding: var(--space-3) var(--space-4);
-  border-right: 1px solid var(--border);
+  border-inline-end: 1px solid var(--border);
 }
 
 .stat:last-child {
-  border-right: none;
+  border-inline-end: none;
 }
 
 .statLabel {

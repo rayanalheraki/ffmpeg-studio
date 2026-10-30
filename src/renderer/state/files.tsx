@@ -2,6 +2,7 @@ import { createContext, useCallback, useContext, useMemo, useReducer, type React
 import { errorMessage, studio } from '../lib/api';
 import { MAIN_SLOT, filesReducer, type FilesState } from './files-reducer';
 import { useToasts } from './toasts';
+import { t, tp } from '@shared/i18n';
 
 interface FilesApi {
   slots: FilesState;
@@ -30,14 +31,14 @@ export function FilesProvider({ children }: { children: ReactNode }): React.JSX.
           if (unreadable.length > 0) {
             show(
               'warning',
-              `${unreadable.length} file${unreadable.length > 1 ? 's' : ''} could not be read`,
+              tp(unreadable.length, '{count} file could not be read', '{count} files could not be read'),
               unreadable.map((f) => f.fileName).join(', '),
             );
           }
         })
         .catch((error: unknown) => {
           dispatch({ type: 'drop', slot, paths });
-          show('error', 'Files could not be added', errorMessage(error));
+          show('error', t('Files could not be added'), errorMessage(error));
         });
     },
     [show],

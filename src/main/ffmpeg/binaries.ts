@@ -1,6 +1,7 @@
 import { existsSync } from 'node:fs';
 import ffmpegStaticPath from 'ffmpeg-static';
 import { path as ffprobeStaticPath } from 'ffprobe-static';
+import { t } from '@shared/i18n';
 import { UserError } from '../log';
 
 /**
@@ -12,10 +13,10 @@ function unpacked(binaryPath: string): string {
 }
 
 function resolveBinary(name: string, rawPath: string | null): string {
-  if (!rawPath) throw new UserError(`The bundled ${name} binary is not available for this platform.`);
+  if (!rawPath) throw new UserError(t('The bundled {name} binary is not available for this platform.', { name }));
   const resolved = unpacked(rawPath);
   if (!existsSync(resolved)) {
-    throw new UserError(`The bundled ${name} binary is missing. Reinstall the app or run "npm install" again.`);
+    throw new UserError(t('The bundled {name} binary is missing. Reinstall the app or run "npm install" again.', { name }));
   }
   return resolved;
 }

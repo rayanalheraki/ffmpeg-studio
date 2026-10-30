@@ -1,6 +1,7 @@
 import { randomUUID } from 'node:crypto';
 import Store from 'electron-store';
 import { DEFAULT_SETTINGS, MAX_PRESETS_PER_OPERATION } from '@shared/constants';
+import { t } from '@shared/i18n';
 import { getOperation } from '@shared/operations/registry';
 import { normalizeOptions } from '@shared/operations/schema';
 import type { Preset, Settings, SettingsPatch } from '@shared/types/settings';
@@ -33,13 +34,13 @@ export class SettingsStore {
 
   savePreset(operationId: unknown, name: unknown, options: unknown): Preset[] {
     const operation = typeof operationId === 'string' ? getOperation(operationId) : undefined;
-    if (!operation) throw new UserError('Unknown operation.');
+    if (!operation) throw new UserError(t('Unknown operation.'));
     const trimmed = typeof name === 'string' ? name.trim().slice(0, 80) : '';
-    if (trimmed === '') throw new UserError('Enter a name for the preset.');
+    if (trimmed === '') throw new UserError(t('Enter a name for the preset.'));
 
     const others = this.current.presets.filter((p) => !(p.operationId === operation.id && p.name.toLowerCase() === trimmed.toLowerCase()));
     if (others.filter((p) => p.operationId === operation.id).length >= MAX_PRESETS_PER_OPERATION) {
-      throw new UserError(`You can save up to ${MAX_PRESETS_PER_OPERATION} presets per operation.`);
+      throw new UserError(t('You can save up to {count} presets per operation.', { count: MAX_PRESETS_PER_OPERATION }));
     }
     const preset: Preset = {
       id: randomUUID(),
@@ -64,7 +65,7 @@ export class SettingsStore {
       this.store.set({ ...this.current });
     } catch (error) {
       log.error('Failed to save settings', error);
-      throw new UserError('Your settings could not be saved. Check that the disk is not full.');
+      throw new UserError(t('Your settings could not be saved. Check that the disk is not full.'));
     }
   }
 }

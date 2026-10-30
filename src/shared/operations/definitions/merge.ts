@@ -3,6 +3,7 @@ import { defineOperation } from '../types';
 import { audioEncoderFor, containerFlags, videoEncoderArgs } from '../helpers/encoders';
 import { even, round } from '../helpers/filters';
 import { primaryFile } from '../helpers/streams';
+import { t } from '../../i18n';
 
 type Options = {
   format: string;
@@ -69,10 +70,10 @@ export default defineOperation<Options>({
   validate: (o, inputs) => {
     const format = resolveFormat(o, primaryFile(inputs));
     if (VIDEO_OUTPUTS.includes(format) && inputs.main.some((file) => !file.hasVideo)) {
-      return 'Every file must contain video to merge into a video. Choose an audio format instead.';
+      return t('Every file must contain video to merge into a video. Choose an audio format instead.');
     }
     const missingDuration = inputs.main.some((file) => !file.hasAudio && file.duration == null);
-    if (missingDuration) return 'Could not read the duration of a file without audio.';
+    if (missingDuration) return t('Could not read the duration of a file without audio.');
     return null;
   },
   buildArgs: (o, inputs, ctx) => {

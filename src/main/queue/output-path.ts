@@ -1,5 +1,6 @@
 import { existsSync } from 'node:fs';
 import { parse, join } from 'node:path';
+import { t } from '@shared/i18n';
 import type { OverwriteBehavior } from '@shared/types/jobs';
 
 export interface ResolvedOutput {
@@ -18,12 +19,12 @@ export function resolveOutputPath(planned: string, behavior: OverwriteBehavior, 
 
   if (isPattern || !taken(planned)) return { path: planned, skipReason: null };
   if (behavior === 'overwrite' && !reserved.has(planned.toLowerCase())) return { path: planned, skipReason: null };
-  if (behavior === 'skip') return { path: planned, skipReason: 'Skipped because the output file already exists.' };
+  if (behavior === 'skip') return { path: planned, skipReason: t('Skipped because the output file already exists.') };
 
   const { dir, name, ext } = parse(planned);
   for (let n = 1; n < 10_000; n += 1) {
     const candidate = join(dir, `${name} (${n})${ext}`);
     if (!taken(candidate)) return { path: candidate, skipReason: null };
   }
-  return { path: planned, skipReason: 'Skipped because no free output file name was found.' };
+  return { path: planned, skipReason: t('Skipped because no free output file name was found.') };
 }

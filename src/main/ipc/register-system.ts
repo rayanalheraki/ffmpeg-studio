@@ -1,6 +1,7 @@
 import { existsSync } from 'node:fs';
 import { dirname, isAbsolute } from 'node:path';
 import { type BrowserWindow, app, dialog, shell } from 'electron';
+import { t } from '@shared/i18n';
 import { IPC, type OpenFilesRequest } from '@shared/ipc';
 import { extensionsFor, KIND_LABELS } from '@shared/media/kinds';
 import type { MediaKind } from '@shared/types/media';
@@ -14,7 +15,7 @@ function parseOpenRequest(value: unknown): OpenFilesRequest {
   const raw = (typeof value === 'object' && value !== null ? value : {}) as Record<string, unknown>;
   const kinds = Array.isArray(raw.kinds) ? raw.kinds.filter((k): k is MediaKind => KINDS.includes(k as MediaKind)) : [];
   return {
-    title: typeof raw.title === 'string' ? raw.title.slice(0, 100) : 'Add files',
+    title: typeof raw.title === 'string' ? raw.title.slice(0, 100) : t('Add files'),
     kinds: kinds.length > 0 ? kinds : [...KINDS],
     multiple: raw.multiple !== false,
   };
@@ -41,13 +42,13 @@ export function registerSystemIpc(deps: SystemDeps): void {
   handle(IPC.dialogOpenFiles, async (value) => {
     const request = parseOpenRequest(value);
     const win = deps.getWindow();
-    const label = request.kinds.map((kind) => KIND_LABELS[kind]).join(', ');
+    const label = request.kinds.map((kind) => t(KIND_LABELS[kind])).join(', ');
     const options: Electron.OpenDialogOptions = {
       title: request.title,
       properties: request.multiple ? ['openFile', 'multiSelections'] : ['openFile'],
       filters: [
-        { name: `${label} files`, extensions: extensionsFor(request.kinds) },
-        { name: 'All files', extensions: ['*'] },
+        { name: t('{kinds} files', { kinds: label }), extensions: extensionsFor(request.kinds) },
+        { name: t('All files'), extensions: ['*'] },
       ],
     };
     const result = win ? await dialog.showOpenDialog(win, options) : await dialog.showOpenDialog(options);
@@ -57,7 +58,7 @@ export function registerSystemIpc(deps: SystemDeps): void {
   handle(IPC.dialogSelectFolder, async (defaultPath) => {
     const win = deps.getWindow();
     const options: Electron.OpenDialogOptions = {
-      title: 'Choose output folder',
+      title: t('Choose output folder'),
       properties: ['openDirectory', 'createDirectory'],
       defaultPath: typeof defaultPath === 'string' && isAbsolute(defaultPath) ? defaultPath : app.getPath('videos'),
     };
@@ -67,7 +68,7 @@ export function registerSystemIpc(deps: SystemDeps): void {
 
   handle(IPC.shellShowInFolder, (value) => {
     const filePath = assertString(value, 'path');
-    if (!deps.isOpenable(filePath)) throw new UserError('This file is not part of the job list.');
+    if (!deps.isOpenable(filePath)) throw new UserError(t('This file is not part of the job list.'));
     if (filePath.includes('%0') || !existsSync(filePath)) {
       void shell.openPath(dirname(filePath));
       return;
@@ -77,11 +78,11 @@ export function registerSystemIpc(deps: SystemDeps): void {
 
   handle(IPC.shellOpenPath, async (value) => {
     const filePath = assertString(value, 'path');
-    if (!deps.isOpenable(filePath)) throw new UserError('This file is not part of the job list.');
+    if (!deps.isOpenable(filePath)) throw new UserError(t('This file is not part of the job list.'));
     const target = filePath.includes('%0') ? dirname(filePath) : filePath;
-    if (!existsSync(target)) throw new UserError('The file no longer exists.');
+    if (!existsSync(target)) throw new UserError(t('The file no longer exists.'));
     const error = await shell.openPath(target);
-    if (error) throw new UserError(`The file could not be opened: ${error}`);
+    if (error) throw new UserError(t('The file could not be opened: {error}', { error }));
   });
 
   handle(IPC.appEnvironment, () => deps.environment());

@@ -1,5 +1,6 @@
 import { CircleAlert, CircleCheck, Info, TriangleAlert, X } from 'lucide-react';
 import { useToasts, type ToastTone } from '../../state/toasts';
+import { useI18n } from '../../state/i18n';
 import styles from './Toaster.module.css';
 
 const ICONS: Record<ToastTone, React.JSX.Element> = {
@@ -11,8 +12,9 @@ const ICONS: Record<ToastTone, React.JSX.Element> = {
 
 export function Toaster(): React.JSX.Element {
   const { toasts, dismiss } = useToasts();
+  const { t } = useI18n();
   return (
-    <div className={styles.region} role="region" aria-label="Notifications" aria-live="polite">
+    <div className={styles.region} role="region" aria-label={t('Notifications')} aria-live="polite">
       {toasts.map((toast) => (
         <div key={toast.id} className={styles.toast} data-tone={toast.tone} role={toast.tone === 'error' ? 'alert' : 'status'}>
           <span className={styles.icon}>{ICONS[toast.tone]}</span>
@@ -20,7 +22,7 @@ export function Toaster(): React.JSX.Element {
             <p className={styles.title}>{toast.title}</p>
             {toast.description && <p className={styles.description}>{toast.description}</p>}
           </div>
-          <button type="button" className={styles.close} aria-label="Dismiss notification" onClick={() => dismiss(toast.id)}>
+          <button type="button" className={styles.close} aria-label={t('Dismiss notification')} onClick={() => dismiss(toast.id)}>
             <X size={14} />
           </button>
         </div>

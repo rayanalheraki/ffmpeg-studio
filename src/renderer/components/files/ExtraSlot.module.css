@@ -44,7 +44,7 @@
 }
 
 .required {
-  margin-left: var(--space-1);
+  margin-inline-start: var(--space-1);
   font-size: var(--text-2xs);
   font-weight: var(--weight-semibold);
   color: var(--warning);

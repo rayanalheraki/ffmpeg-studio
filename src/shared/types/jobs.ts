@@ -48,6 +48,8 @@ export interface JobSnapshot {
   progress: JobProgress;
   /** User-friendly status detail (error summary, skip reason). */
   message: string | null;
+  /** Never started because of the overwrite setting; cannot be retried. */
+  skipped: boolean;
   createdAt: number;
   startedAt: number | null;
   finishedAt: number | null;

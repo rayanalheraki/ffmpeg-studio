@@ -1,4 +1,5 @@
 import { unlink } from 'node:fs/promises';
+import { t } from '@shared/i18n';
 import { computeProgress, emptyProgress } from '@shared/jobs/progress';
 import type { JobEvent, JobOutputInfo, JobSnapshot, JobStatus } from '@shared/types/jobs';
 import { summarizeFailure } from '../ffmpeg/errors';
@@ -74,6 +75,7 @@ export class JobQueue {
         status: spec.skipReason ? 'cancelled' : 'queued',
         progress: emptyProgress(),
         message: spec.skipReason,
+        skipped: spec.skipReason != null,
         createdAt: Date.now(),
         startedAt: null,
         finishedAt: spec.skipReason ? Date.now() : null,
@@ -114,14 +116,14 @@ export class JobQueue {
   cancel(id: string): void {
     const record = this.jobs.get(id);
     if (!record) return;
-    if (record.snapshot.status === 'queued') this.finish(record, 'cancelled', 'Cancelled before starting.');
+    if (record.snapshot.status === 'queued') this.finish(record, 'cancelled', t('Cancelled before starting.'));
     else if (record.snapshot.status === 'running') record.handle?.cancel();
     this.pump();
   }
 
   cancelAll(): void {
     for (const record of this.jobs.values()) {
-      if (record.snapshot.status === 'queued') this.finish(record, 'cancelled', 'Cancelled before starting.');
+      if (record.snapshot.status === 'queued') this.finish(record, 'cancelled', t('Cancelled before starting.'));
     }
     for (const record of this.jobs.values()) {
       if (record.snapshot.status === 'running') record.handle?.cancel();
@@ -197,7 +199,7 @@ export class JobQueue {
       binary = this.hooks.resolveBinary();
     } catch (error) {
       this.running -= 1;
-      this.finish(record, 'failed', error instanceof Error ? error.message : 'FFmpeg is not available.');
+      this.finish(record, 'failed', error instanceof Error ? error.message : t('FFmpeg is not available.'));
       return;
     }
 
@@ -218,10 +220,10 @@ export class JobQueue {
       record.handle = null;
       if (outcome.cancelled) {
         await this.removePartialOutput(record);
-        this.finish(record, 'cancelled', 'Cancelled.');
+        this.finish(record, 'cancelled', t('Cancelled.'));
       } else if (outcome.spawnError) {
         record.log = appendLog(record.log, `\n${outcome.spawnError.message}\n`);
-        this.finish(record, 'failed', 'FFmpeg could not be started. The bundled binary may be blocked by security software.');
+        this.finish(record, 'failed', t('FFmpeg could not be started. The bundled binary may be blocked by security software.'));
       } else if (outcome.exitCode === 0) {
         record.snapshot.output = await this.describeOutput(record);
         this.finish(record, 'completed', null);

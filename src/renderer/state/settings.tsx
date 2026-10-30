@@ -4,6 +4,7 @@ import type { OptionValues } from '@shared/operations/types';
 import type { AppEnvironment, Preset, Settings, SettingsPatch } from '@shared/types/settings';
 import { errorMessage, studio } from '../lib/api';
 import { useToasts } from './toasts';
+import { t } from '@shared/i18n';
 
 interface SettingsApi {
   settings: Settings;
@@ -37,7 +38,7 @@ export function SettingsProvider({ children }: { children: ReactNode }): React.J
         setSettings(stored);
         setEnvironment(env);
       })
-      .catch((error: unknown) => show('error', 'Could not load your settings', errorMessage(error)))
+      .catch((error: unknown) => show('error', t('Could not load your settings'), errorMessage(error)))
       .finally(() => setLoaded(true));
   }, [show]);
 
@@ -45,7 +46,7 @@ export function SettingsProvider({ children }: { children: ReactNode }): React.J
     const patch = pending.current;
     if (Object.keys(patch).length === 0) return;
     pending.current = {};
-    studio.settings.update(patch).catch((error: unknown) => show('error', 'Settings were not saved', errorMessage(error)));
+    studio.settings.update(patch).catch((error: unknown) => show('error', t('Settings were not saved'), errorMessage(error)));
   }, [show]);
 
   // Save edits made within the debounce window before the window closes.
@@ -77,10 +78,10 @@ export function SettingsProvider({ children }: { children: ReactNode }): React.J
         const presets = await studio.presets.save(operationId, name, options);
         latest.current = { ...latest.current, presets };
         setSettings(latest.current);
-        show('success', `Preset “${name.trim()}” saved`);
+        show('success', t('Preset “{name}” saved', { name: name.trim() }));
         return true;
       } catch (error) {
-        show('error', 'Preset not saved', errorMessage(error));
+        show('error', t('Preset not saved'), errorMessage(error));
         return false;
       }
     },
@@ -94,7 +95,7 @@ export function SettingsProvider({ children }: { children: ReactNode }): React.J
         latest.current = { ...latest.current, presets };
         setSettings(latest.current);
       } catch (error) {
-        show('error', 'Preset not deleted', errorMessage(error));
+        show('error', t('Preset not deleted'), errorMessage(error));
       }
     },
     [show],

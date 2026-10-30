@@ -3,6 +3,7 @@ import { parseTime, toFfmpegTime } from '../../utils/time';
 import { defineOperation } from '../types';
 import { audioEncoderFor, containerFlags, videoEncoderArgs } from '../helpers/encoders';
 import { h264Container, primaryFile } from '../helpers/streams';
+import { t } from '../../i18n';
 
 type Options = {
   start: string;
@@ -47,11 +48,11 @@ export default defineOperation<Options>({
   validate: (o, inputs) => {
     const start = parseTime(o.start);
     const end = parseTime(o.end);
-    if (o.start.trim() !== '' && start == null) return 'Start time is not a valid timestamp.';
-    if (o.end.trim() !== '' && end == null) return 'End time is not a valid timestamp.';
-    if (start != null && end != null && end <= start) return 'End time must be after the start time.';
+    if (o.start.trim() !== '' && start == null) return t('Start time is not a valid timestamp.');
+    if (o.end.trim() !== '' && end == null) return t('End time is not a valid timestamp.');
+    if (start != null && end != null && end <= start) return t('End time must be after the start time.');
     const total = primaryFile(inputs).duration;
-    if (start != null && total != null && start >= total) return 'Start time is beyond the end of the file.';
+    if (start != null && total != null && start >= total) return t('Start time is beyond the end of the file.');
     return null;
   },
   buildArgs: (o, inputs, ctx) => {

@@ -49,6 +49,18 @@ The same pure shared functions run in two places, which keeps the UI preview ide
 
 `JobQueue` (`main/queue/job-queue.ts`) runs up to N concurrent `spawn` processes (argument arrays, never a shell), parses `-progress pipe:1` against the expected duration, keeps stderr as the job log, emits `JobEvent`s to the renderer (throttled), deletes partial outputs on failure (except image sequences), and fires a desktop notification when a batch ends.
 
+### Translations (English, Arabic, Turkish)
+
+`src/shared/i18n/` is gettext-style: the English text is the key, and `locales/{ar,tr}/` map it to translations (`operations.ts` for definition strings, `app.ts` for everything else). Missing keys fall back to English. Main and renderer each keep a current locale (`setLocale`), driven by `settings.language`; main translates its own messages (errors, notifications, dialogs, job messages).
+
+- Renderer components use `const { t, tp } = useI18n()` (from `state/i18n.tsx`) so they re-render on a language change; shared code, main and non-render callbacks import `t`/`tp` from `@shared/i18n`.
+- Labels declared in constants are marked with `msg('...')` and translated where rendered with `t(label)`. Operation definitions stay plain English and `FieldControl`/pages call `t()` on them.
+- Counts use `tp(count, one, other)`; the key is the `other` form, and Arabic entries supply CLDR plural forms (`one`, `two`, `few`, `many`, `other`).
+- A `context|` prefix (e.g. `action|Start`, `theme|Light`) separates identical English words that translate differently; it is stripped on fallback.
+- Never branch on message text: it is translated (e.g. skipped jobs use `JobSnapshot.skipped`).
+- `tests/core/i18n.test.ts` scans the source for `t`/`tp`/`msg` literals and the operation registry, and fails on missing, stale or placeholder-mismatched entries. Keep the first argument of those calls a string literal.
+- Arabic is RTL (`dir` set on `<html>`): use logical CSS properties (`margin-inline-start`, `inset-inline-end`, `text-align: start`), mirror direction-dependent transforms with `:dir(rtl)`, and keep commands/paths `dir="ltr"`.
+
 ### Settings
 
 `SettingsStore` persists via electron-store; values on disk are treated as untrusted and run through `settings/sanitize.ts` on load and on every patch. Presets are stored per operation and normalized with `normalizeOptions`.

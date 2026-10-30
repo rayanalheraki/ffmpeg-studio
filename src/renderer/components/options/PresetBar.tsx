@@ -8,6 +8,7 @@ import { Dialog } from '../ui/Dialog';
 import { Field } from '../ui/Field';
 import { Popover } from '../ui/Popover';
 import { TextInput } from '../ui/TextInput';
+import { useI18n } from '../../state/i18n';
 import styles from './Options.module.css';
 
 interface PresetBarProps {
@@ -20,6 +21,7 @@ interface PresetBarProps {
 /** Save the current options as a named preset and re-apply saved presets. */
 export function PresetBar({ operation, options, onApply, onReset }: PresetBarProps): React.JSX.Element {
   const { presetsFor, savePreset, deletePreset } = useSettings();
+  const { t, locale } = useI18n();
   const [saving, setSaving] = useState(false);
   const [name, setName] = useState('');
   const presets = presetsFor(operation.id);
@@ -35,24 +37,27 @@ export function PresetBar({ operation, options, onApply, onReset }: PresetBarPro
   return (
     <div className={styles.presets}>
       <Popover
-        label="Presets"
+        label={t('Presets')}
         width={260}
         trigger={({ ref, toggle, open }) => (
           <Button ref={ref} size="sm" variant="ghost" icon="Bookmark" iconRight="ChevronDown" aria-expanded={open} onClick={toggle}>
-            Presets{presets.length > 0 ? ` (${presets.length})` : ''}
+            {t('Presets')}
+            {presets.length > 0 ? ` (${presets.length})` : ''}
           </Button>
         )}
       >
         {(close) => (
           <div className={styles.menu} role="menu">
-            {presets.length === 0 && <p className={styles.menuEmpty}>No saved presets for {operation.label} yet.</p>}
+            {presets.length === 0 && (
+              <p className={styles.menuEmpty}>{t('No saved presets for {operation} yet.', { operation: t(operation.label) })}</p>
+            )}
             {presets.map((preset) => (
               <div key={preset.id} className={styles.menuItem} role="menuitem">
                 <Bookmark size={14} />
                 <button
                   type="button"
                   className={styles.menuItemName}
-                  style={{ textAlign: 'left' }}
+                  style={{ textAlign: 'start' }}
                   onClick={() => {
                     onApply(normalizeOptions(operation, preset.options));
                     close();
@@ -62,7 +67,7 @@ export function PresetBar({ operation, options, onApply, onReset }: PresetBarPro
                 </button>
                 <IconButton
                   icon="Trash"
-                  label={`Delete preset ${preset.name}`}
+                  label={t('Delete preset {name}', { name: preset.name })}
                   tone="danger"
                   onClick={() => void deletePreset(preset.id)}
                 />
@@ -78,7 +83,7 @@ export function PresetBar({ operation, options, onApply, onReset }: PresetBarPro
                 setSaving(true);
               }}
             >
-              <Bookmark size={14} /> Save current settings…
+              <Bookmark size={14} /> {t('Save current settings…')}
             </button>
             <button
               type="button"
@@ -89,33 +94,35 @@ export function PresetBar({ operation, options, onApply, onReset }: PresetBarPro
                 close();
               }}
             >
-              <Trash size={14} /> Reset to defaults
+              <Trash size={14} /> {t('Reset to defaults')}
             </button>
           </div>
         )}
       </Popover>
       <Dialog
         open={saving}
-        title="Save preset"
-        description={`Store the current ${operation.label.toLowerCase()} settings to reuse them later.`}
+        title={t('Save preset')}
+        description={t('Store the current {operation} settings to reuse them later.', {
+          operation: t(operation.label).toLocaleLowerCase(locale),
+        })}
         onClose={() => setSaving(false)}
         footer={
           <>
             <Button variant="ghost" onClick={() => setSaving(false)}>
-              Cancel
+              {t('Cancel')}
             </Button>
             <Button variant="primary" disabled={name.trim() === ''} onClick={() => void submit()}>
-              Save preset
+              {t('Save preset')}
             </Button>
           </>
         }
       >
-        <Field label="Preset name" htmlFor="preset-name">
+        <Field label={t('Preset name')} htmlFor="preset-name">
           <TextInput
             id="preset-name"
             value={name}
             maxLength={80}
-            placeholder="e.g. Instagram square"
+            placeholder={t('e.g. Instagram square')}
             onChange={setName}
             onKeyDown={(event) => event.key === 'Enter' && void submit()}
           />

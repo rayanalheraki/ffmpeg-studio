@@ -3,7 +3,7 @@
   flex-direction: column;
   width: var(--queue-width);
   min-height: 0;
-  border-left: 1px solid var(--border);
+  border-inline-start: 1px solid var(--border);
   background: var(--bg);
 }
 
@@ -13,20 +13,24 @@
   .panel {
     position: absolute;
     top: 0;
-    right: 0;
+    inset-inline-end: 0;
     bottom: var(--footer-height);
     border-bottom: 1px solid var(--border);
-    border-bottom-left-radius: var(--radius-lg);
+    border-end-start-radius: var(--radius-lg);
     z-index: var(--z-overlay);
     width: min(var(--queue-width), 92vw);
     box-shadow: var(--shadow-lg);
     animation: slide-in var(--duration-slow) var(--ease-out);
   }
+
+  .panel:dir(rtl) {
+    --slide-from: -16px;
+  }
 }
 
 @keyframes slide-in {
   from {
-    transform: translateX(16px);
+    transform: translateX(var(--slide-from, 16px));
     opacity: 0;
   }
   to {

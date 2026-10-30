@@ -1,6 +1,7 @@
 import { defineOperation } from '../types';
 import { round } from '../helpers/filters';
 import { primaryFile, visualEncodeArgs, visualExtension } from '../helpers/streams';
+import { t } from '../../i18n';
 
 type Options = {
   brightness: number;
@@ -65,7 +66,7 @@ export default defineOperation<Options>({
     },
   ],
   outputExtension: (_o, file) => visualExtension(file),
-  validate: (o) => (videoFilterChain(o).length === 0 ? 'Change at least one setting to apply a filter.' : null),
+  validate: (o) => (videoFilterChain(o).length === 0 ? t('Change at least one setting to apply a filter.') : null),
   buildArgs: (o, inputs, ctx) => {
     const file = primaryFile(inputs);
     return ['-i', file.path, '-vf', videoFilterChain(o).join(','), ...visualEncodeArgs(file), ctx.output];

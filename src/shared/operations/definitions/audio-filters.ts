@@ -1,6 +1,7 @@
 import { defineOperation } from '../types';
 import { audioEncoderFor, containerFlags } from '../helpers/encoders';
 import { audioContainer, primaryFile } from '../helpers/streams';
+import { t } from '../../i18n';
 
 type Options = {
   noiseReduction: string;
@@ -77,8 +78,8 @@ export default defineOperation<Options>({
   ],
   outputExtension: (_o, file) => audioContainer(file),
   validate: (o, inputs) => {
-    if (!primaryFile(inputs).hasAudio) return 'This file has no audio track.';
-    return audioFilterChain(o).length === 0 ? 'Turn on at least one filter.' : null;
+    if (!primaryFile(inputs).hasAudio) return t('This file has no audio track.');
+    return audioFilterChain(o).length === 0 ? t('Turn on at least one filter.') : null;
   },
   buildArgs: (o, inputs, ctx) => {
     const file = primaryFile(inputs);

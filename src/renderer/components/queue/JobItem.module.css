@@ -159,3 +159,8 @@
 .logToggle[aria-expanded='true'] svg {
   transform: rotate(90deg);
 }
+
+/* The collapsed chevron points toward the reading direction. */
+.logToggle:dir(rtl)[aria-expanded='false'] svg {
+  transform: scaleX(-1);
+}
