@@ -1,6 +1,6 @@
 import { unlink } from 'node:fs/promises';
 import { computeProgress, emptyProgress } from '@shared/jobs/progress';
-import type { JobEvent, JobSnapshot, JobStatus } from '@shared/types/jobs';
+import type { JobEvent, JobOutputInfo, JobSnapshot, JobStatus } from '@shared/types/jobs';
 import { summarizeFailure } from '../ffmpeg/errors';
 import { appendLog, runFfmpeg, type RunHandle } from '../ffmpeg/runner';
 import { createLogger } from '../log';
@@ -36,6 +36,8 @@ export interface QueueHooks {
   emit(event: JobEvent): void;
   onBatchFinished(summary: BatchSummary): void;
   resolveBinary(): string;
+  /** Reads a finished output file for display; null when it cannot be read. */
+  describeOutput(filePath: string): Promise<JobOutputInfo | null>;
 }
 
 interface JobRecord {
@@ -76,6 +78,7 @@ export class JobQueue {
         startedAt: null,
         finishedAt: spec.skipReason ? Date.now() : null,
         hasLog: false,
+        output: null,
       };
       this.jobs.set(spec.id, { spec, snapshot, log: '', handle: null, lastEmit: 0 });
       if (spec.skipReason) this.session.cancelled += 1;
@@ -138,6 +141,7 @@ export class JobQueue {
       startedAt: null,
       finishedAt: null,
       hasLog: false,
+      output: null,
     };
     this.session.active = true;
     this.emit(id);
@@ -219,6 +223,7 @@ export class JobQueue {
         record.log = appendLog(record.log, `\n${outcome.spawnError.message}\n`);
         this.finish(record, 'failed', 'FFmpeg could not be started. The bundled binary may be blocked by security software.');
       } else if (outcome.exitCode === 0) {
+        record.snapshot.output = await this.describeOutput(record);
         this.finish(record, 'completed', null);
       } else {
         await this.removePartialOutput(record);
@@ -236,6 +241,16 @@ export class JobQueue {
     else if (status === 'cancelled') this.session.cancelled += 1;
     if (status === 'failed') log.warn(`Job ${record.spec.id} failed: ${message ?? 'unknown error'}`);
     this.emit(record.spec.id);
+  }
+
+  private async describeOutput(record: JobRecord): Promise<JobOutputInfo | null> {
+    if (record.spec.isSequence) return null;
+    try {
+      return await this.hooks.describeOutput(record.spec.outputPath);
+    } catch (error) {
+      log.warn(`Could not read output ${record.spec.outputPath}`, error);
+      return null;
+    }
   }
 
   private async removePartialOutput(record: JobRecord): Promise<void> {

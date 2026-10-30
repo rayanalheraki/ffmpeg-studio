@@ -1,12 +1,12 @@
 import { Ban, CircleCheck, CircleX, ChevronRight, Clock, LoaderCircle } from 'lucide-react';
-import { memo, useState } from 'react';
+import { Fragment, memo, useState } from 'react';
 import type { JobSnapshot, JobStatus } from '@shared/types/jobs';
-import { formatMs } from '@shared/utils/format';
+import { formatBytes, formatMs, formatResolution } from '@shared/utils/format';
 import { basename } from '@shared/utils/path';
 import { studio } from '../../lib/api';
 import { useJobs } from '../../state/jobs';
 import { IconButton } from '../ui/Button';
-import { ProgressBar } from '../ui/Feedback';
+import { Badge, ProgressBar } from '../ui/Feedback';
 import { JobLog } from './JobLog';
 import styles from './JobItem.module.css';
 
@@ -25,6 +25,15 @@ const STATUS_LABEL: Record<JobStatus, string> = {
   failed: 'Failed',
   cancelled: 'Cancelled',
 };
+
+function outputDetails(job: JobSnapshot): string[] {
+  const { output, startedAt, finishedAt } = job;
+  return [
+    output && formatBytes(output.size),
+    output && formatResolution(output.width, output.height),
+    startedAt && finishedAt ? `Finished in ${formatMs(finishedAt - startedAt)}` : null,
+  ].filter((item): item is string => Boolean(item));
+}
 
 function JobItemComponent({ job }: { job: JobSnapshot }): React.JSX.Element {
   const { act } = useJobs();
@@ -92,8 +101,16 @@ function JobItemComponent({ job }: { job: JobSnapshot }): React.JSX.Element {
           </div>
         </div>
       )}
-      {status === 'completed' && job.startedAt && job.finishedAt && (
-        <p className={styles.message}>Finished in {formatMs(job.finishedAt - job.startedAt)}</p>
+      {status === 'completed' && (job.output || (job.startedAt && job.finishedAt)) && (
+        <div className={styles.output}>
+          {job.output?.ext && <Badge tone="success">{job.output.ext.toUpperCase()}</Badge>}
+          {outputDetails(job).map((item, index) => (
+            <Fragment key={`${item}-${index}`}>
+              {index > 0 && <span className={styles.dot} />}
+              <span>{item}</span>
+            </Fragment>
+          ))}
+        </div>
       )}
       {(status === 'failed' || status === 'cancelled') && job.message && <p className={styles.message}>{job.message}</p>}
 

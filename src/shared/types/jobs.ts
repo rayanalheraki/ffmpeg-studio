@@ -23,6 +23,16 @@ export interface JobProgress {
   processedSeconds: number;
 }
 
+/** What FFprobe found in a finished job's output file. */
+export interface JobOutputInfo {
+  fileName: string;
+  size: number;
+  /** Lower-case extension without the dot. */
+  ext: string;
+  width: number | null;
+  height: number | null;
+}
+
 export interface JobSnapshot {
   id: string;
   batchId: string;
@@ -42,6 +52,8 @@ export interface JobSnapshot {
   startedAt: number | null;
   finishedAt: number | null;
   hasLog: boolean;
+  /** Set once a job completes and its output could be read. */
+  output: JobOutputInfo | null;
 }
 
 export interface StartBatchRequest {

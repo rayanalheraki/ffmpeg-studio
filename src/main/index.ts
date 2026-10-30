@@ -10,6 +10,7 @@ import { registerJobsIpc } from './ipc/register-jobs';
 import { registerMediaIpc } from './ipc/register-media';
 import { registerSystemIpc } from './ipc/register-system';
 import { createLogger } from './log';
+import { probeFile } from './media/probe';
 import { JobQueue, type BatchSummary } from './queue/job-queue';
 import { SettingsStore } from './settings/settings-store';
 import { findSystemFont } from './utils/fonts';
@@ -63,6 +64,11 @@ function bootstrap(): void {
       emit: (event: JobEvent) => send(IPC.jobsEvent, event),
       onBatchFinished: (summary) => notifyBatch(summary, settings.get().notifyOnFinish),
       resolveBinary: () => getBinaries().ffmpeg,
+      describeOutput: async (filePath) => {
+        const file = await probeFile(filePath);
+        if (file.probeError === 'File not found.') return null;
+        return { fileName: file.fileName, size: file.size, ext: file.ext, width: file.width, height: file.height };
+      },
     },
     settings.get().concurrency,
   );
