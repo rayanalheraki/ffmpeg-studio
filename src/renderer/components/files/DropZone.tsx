@@ -39,7 +39,7 @@ function describe(kinds: MediaKind[], { t, locale }: I18n): string {
 
 /** The primary drop target. Large and inviting when empty, a slim bar once files exist. */
 export function DropZone({ accept, compact = false, label, onFiles, onBrowse }: DropZoneProps): React.JSX.Element {
-  const { active, handlers } = useFileDrop(onFiles);
+  const { active, setZone } = useFileDrop(onFiles);
   const i18n = useI18n();
   const { t } = i18n;
   const kinds = describe(accept, i18n);
@@ -56,7 +56,7 @@ export function DropZone({ accept, compact = false, label, onFiles, onBrowse }: 
           onBrowse();
         }
       }}
-      {...handlers}
+      ref={setZone}
     >
       <div className={styles.icon}>
         <Upload size={compact ? 16 : 22} strokeWidth={1.75} />

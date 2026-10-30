@@ -6,16 +6,11 @@
   padding-inline-start: var(--space-3);
   border-bottom: 1px solid var(--border);
   background: var(--bg);
-  -webkit-app-region: drag;
 }
 
 /* Room for the traffic lights, which macOS keeps on the left in every language. */
 .mac {
   padding-left: 84px;
-}
-
-.noDrag {
-  -webkit-app-region: no-drag;
 }
 
 .brand {

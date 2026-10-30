@@ -1,69 +1,72 @@
-import { useCallback, useRef, useState, type DragEvent } from 'react';
+import { useEffect, useRef, useState } from 'react';
+import type { FileDragEvent } from '@shared/ipc';
 import { studio } from '../lib/api';
 
-/** Internal drags (reordering cards) carry this type and are ignored by drop zones. */
-export const REORDER_MIME = 'application/x-ffmpeg-studio-reorder';
-
-export function isFileDrag(event: DragEvent): boolean {
-  return event.dataTransfer.types.includes('Files') && !event.dataTransfer.types.includes(REORDER_MIME);
-}
-
-/** Absolute paths of dropped files, resolved through the preload bridge. */
-export function droppedPaths(event: DragEvent): string[] {
-  return Array.from(event.dataTransfer.files)
-    .map((file) => studio.files.pathForFile(file))
-    .filter((path) => path !== '');
-}
-
-interface DropHandlers {
-  onDragEnter(event: DragEvent): void;
-  onDragOver(event: DragEvent): void;
-  onDragLeave(event: DragEvent): void;
-  onDrop(event: DragEvent): void;
+interface Zone {
+  onFiles(paths: string[]): void;
+  setActive(active: boolean): void;
 }
 
 /**
- * Drag & drop state for a zone. A depth counter avoids flicker when the
- * pointer crosses child elements.
+ * Files dragged in from the OS arrive as window-level events with a position,
+ * not as DOM events, so drop zones register here and are hit-tested.
  */
-export function useFileDrop(onFiles: (paths: string[]) => void): { active: boolean; handlers: DropHandlers } {
+const zones = new Map<Element, Zone>();
+let hovered: Zone | null = null;
+let listening = false;
+
+/** The innermost registered zone under the pointer. */
+function zoneAt(x: number, y: number): Zone | null {
+  for (let node = document.elementFromPoint(x, y); node; node = node.parentElement) {
+    const zone = zones.get(node);
+    if (zone) return zone;
+  }
+  return null;
+}
+
+function onDragEvent(event: FileDragEvent): void {
+  const zone = event.type === 'leave' ? null : zoneAt(event.x, event.y);
+  if (zone !== hovered) {
+    hovered?.setActive(false);
+    zone?.setActive(true);
+    hovered = zone;
+  }
+  if (event.type === 'drop') {
+    zone?.setActive(false);
+    hovered = null;
+    if (zone && event.paths.length > 0) zone.onFiles(event.paths);
+  }
+}
+
+function register(element: Element, zone: Zone): () => void {
+  if (!listening) {
+    listening = true;
+    studio.files.onDragDrop(onDragEvent);
+  }
+  zones.set(element, zone);
+  return () => {
+    zones.delete(element);
+    if (hovered === zone) hovered = null;
+  };
+}
+
+/**
+ * Makes an element a drop target for files from the OS. Pass `setZone` as the
+ * element's `ref`; nested zones take precedence over their parents.
+ */
+export function useFileDrop(onFiles: (paths: string[]) => void): { active: boolean; setZone: (element: HTMLElement | null) => void } {
   const [active, setActive] = useState(false);
-  const depth = useRef(0);
+  const [element, setElement] = useState<HTMLElement | null>(null);
+  const callback = useRef(onFiles);
 
-  const onDragEnter = useCallback((event: DragEvent) => {
-    if (!isFileDrag(event)) return;
-    event.preventDefault();
-    event.stopPropagation();
-    depth.current += 1;
-    setActive(true);
-  }, []);
+  useEffect(() => {
+    callback.current = onFiles;
+  });
 
-  const onDragOver = useCallback((event: DragEvent) => {
-    if (!isFileDrag(event)) return;
-    event.preventDefault();
-    event.stopPropagation();
-    event.dataTransfer.dropEffect = 'copy';
-  }, []);
+  useEffect(() => {
+    if (!element) return undefined;
+    return register(element, { onFiles: (paths) => callback.current(paths), setActive });
+  }, [element]);
 
-  const onDragLeave = useCallback((event: DragEvent) => {
-    if (!isFileDrag(event)) return;
-    event.stopPropagation();
-    depth.current = Math.max(0, depth.current - 1);
-    if (depth.current === 0) setActive(false);
-  }, []);
-
-  const onDrop = useCallback(
-    (event: DragEvent) => {
-      if (!isFileDrag(event)) return;
-      event.preventDefault();
-      event.stopPropagation();
-      depth.current = 0;
-      setActive(false);
-      const paths = droppedPaths(event);
-      if (paths.length > 0) onFiles(paths);
-    },
-    [onFiles],
-  );
-
-  return { active, handlers: { onDragEnter, onDragOver, onDragLeave, onDrop } };
+  return { active, setZone: setElement };
 }

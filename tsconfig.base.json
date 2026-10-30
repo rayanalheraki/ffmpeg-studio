@@ -17,7 +17,8 @@
     "forceConsistentCasingInFileNames": true,
     "composite": true,
     "paths": {
-      "@shared/*": ["./src/shared/*"]
+      "@shared/*": ["./src/shared/*"],
+      "@backend/*": ["./src/backend/*"]
     }
   }
 }

@@ -11,10 +11,12 @@ import { getOperation } from '@shared/operations/registry';
 import { getDefaultOptions } from '@shared/operations/schema';
 import type { OptionValues } from '@shared/operations/types';
 import type { MediaFile } from '@shared/types/media';
-import { type RawProbe, toMediaFile } from '../../src/main/media/parse-probe';
-import { findSystemFont } from '../../src/main/utils/fonts';
+import { type RawProbe, toMediaFile } from '../../src/backend/media/parse-probe';
+import { fontCandidates } from '../../src/backend/utils/fonts';
 
 const ffmpeg = ffmpegPath ?? '';
+const platform = process.platform === 'win32' || process.platform === 'darwin' ? process.platform : 'linux';
+const fontFile = fontCandidates(platform, process.env.WINDIR ?? null).find((file) => existsSync(file)) ?? null;
 let dir = '';
 const media: Record<string, MediaFile> = {};
 
@@ -133,7 +135,7 @@ describe.skipIf(!ffmpegPath)('operations against the bundled FFmpeg', () => {
     const sequence = operation.outputSequence?.(options) ?? false;
     const base = `${testCase.id}-${testCase.label ?? 'default'}`.replace(/\s/g, '_');
     const output = join(dir, `${base}${sequence ? '_%04d' : ''}.${operation.outputExtension(options, primary)}`);
-    const args = assembleArgs(operation.buildArgs(options, inputs, { output, fontFile: findSystemFont() }));
+    const args = assembleArgs(operation.buildArgs(options, inputs, { output, fontFile }));
 
     const result = run(ffmpeg, args);
     expect(result.status, result.stderr.split('\n').slice(-15).join('\n')).toBe(0);

@@ -38,7 +38,7 @@ export function OperationPage({ operation }: { operation: AnyOperation }): React
   const preview = useBatchPreview(operation, options, extraArgs);
   const { start, starting } = useStartBatch(operation, options, extraArgs, preview);
   const { route, browse } = useAddFiles(operation, options);
-  const pageDrop = useFileDrop(route);
+  const { setZone: setPageZone } = useFileDrop(route);
 
   useHotkeys({ 'mod+o': () => browse(), 'mod+enter': () => void start() });
 
@@ -50,7 +50,7 @@ export function OperationPage({ operation }: { operation: AnyOperation }): React
   const skipped = preview.excluded.length + preview.unsupported.length;
 
   return (
-    <div className={styles.page} {...pageDrop.handlers}>
+    <div className={styles.page} ref={setPageZone}>
       <div className={styles.scroll}>
         <header className={styles.header}>
           <span className={styles.headerIcon}>

@@ -3,7 +3,7 @@
  * a violet gradient rounded square with a white audio waveform.
  *
  * Usage: node scripts/generate-icon.mjs
- * Writes build/icon.png (used by electron-builder) and resources/icon.png (window icon).
+ * Writes build/icon.png, the source for the app icons: run `npx tauri icon build/icon.png -o src-tauri/icons` afterwards.
  */
 import { mkdirSync, writeFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
@@ -104,7 +104,7 @@ function encodePng() {
 }
 
 const png = encodePng();
-for (const target of ['build/icon.png', 'resources/icon.png']) {
+for (const target of ['build/icon.png']) {
   const file = join(root, target);
   mkdirSync(dirname(file), { recursive: true });
   writeFileSync(file, png);

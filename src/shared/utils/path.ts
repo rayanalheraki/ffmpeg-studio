@@ -20,6 +20,11 @@ export function dirname(filePath: string): string {
   return filePath.slice(0, index);
 }
 
+/** POSIX (`/x`), drive (`C:\x`) and UNC (`\\server\x`) paths are absolute. */
+export function isAbsolute(filePath: string): boolean {
+  return filePath.startsWith('/') || /^[A-Za-z]:[\\/]/.test(filePath) || filePath.startsWith('\\\\');
+}
+
 export function stripExtension(fileName: string): string {
   const dot = fileName.lastIndexOf('.');
   return dot > 0 ? fileName.slice(0, dot) : fileName;

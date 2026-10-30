@@ -1,0 +1,75 @@
+name: Build
+
+on:
+  push:
+    branches: [main, tauri-migration]
+    tags: ['v*']
+  pull_request:
+  workflow_dispatch:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  check:
+    name: Typecheck, lint and test
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+      - run: npm ci
+      - run: npm run typecheck
+      - run: npm run lint
+      - run: npm test
+
+  windows:
+    name: Windows installer
+    needs: check
+    runs-on: windows-latest
+    permissions:
+      # Needed to create the draft release for version tags.
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+      - uses: dtolnay/rust-toolchain@stable
+      - uses: swatinem/rust-cache@v2
+        with:
+          workspaces: src-tauri -> target
+
+      - run: npm ci
+      # ffmpeg-static downloads its binary in an install script; make sure it ran.
+      - name: Ensure FFmpeg binary
+        shell: bash
+        run: node -e "require('fs').accessSync(require('ffmpeg-static'))" || npm rebuild ffmpeg-static
+
+      - name: Build installer
+        run: npm run package
+
+      - name: Report size
+        shell: bash
+        run: |
+          ls -l src-tauri/target/release/bundle/nsis/
+          echo "Installed app folder (exe + sidecars):"
+          du -ch src-tauri/target/release/*.exe | tail -1
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: ffmpeg-studio-windows
+          path: src-tauri/target/release/bundle/nsis/*.exe
+          if-no-files-found: error
+
+      - name: Draft GitHub release
+        if: startsWith(github.ref, 'refs/tags/v')
+        uses: softprops/action-gh-release@v2
+        with:
+          draft: true
+          name: FFmpeg Studio ${{ github.ref_name }}
+          files: src-tauri/target/release/bundle/nsis/*.exe

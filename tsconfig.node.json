@@ -1,17 +1,9 @@
 {
   "extends": "./tsconfig.base.json",
   "compilerOptions": {
-    "lib": ["ES2023"],
+    "lib": ["ES2023", "DOM"],
     "types": ["node", "vite/client"],
     "tsBuildInfoFile": "./node_modules/.cache/tsconfig.node.tsbuildinfo"
   },
-  "include": [
-    "src/main/**/*",
-    "src/preload/**/*",
-    "src/shared/**/*",
-    "tests/**/*",
-    "electron.vite.config.ts",
-    "vitest.config.mts",
-    "vitest.integration.config.mts"
-  ]
+  "include": ["src/backend/**/*", "src/shared/**/*", "tests/**/*", "vite.config.ts", "vitest.config.mts", "vitest.integration.config.mts"]
 }

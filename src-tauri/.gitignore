@@ -1,0 +1,4 @@
+/target/
+/gen/schemas
+# Copied from ffmpeg-static / ffprobe-static by scripts/prepare-binaries.mjs
+/binaries/

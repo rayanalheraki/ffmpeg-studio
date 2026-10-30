@@ -1,5 +1,5 @@
 import { GripVertical } from 'lucide-react';
-import { Fragment, memo, type DragEvent, type KeyboardEvent } from 'react';
+import { Fragment, memo, type KeyboardEvent, type PointerEvent } from 'react';
 import { formatBytes, formatResolution } from '@shared/utils/format';
 import { KIND_LABELS } from '@shared/media/kinds';
 import { cx } from '../../lib/cx';
@@ -11,13 +11,13 @@ import { useI18n } from '../../state/i18n';
 import styles from './FileCard.module.css';
 
 export interface CardDragProps {
-  draggable: boolean;
+  index: number;
   dragging: boolean;
   dropPosition: 'before' | 'after' | null;
-  onDragStart(event: DragEvent): void;
-  onDragOver(event: DragEvent): void;
-  onDragEnd(): void;
-  onDrop(event: DragEvent): void;
+  onPointerDown(event: PointerEvent<HTMLElement>): void;
+  onPointerMove(event: PointerEvent<HTMLElement>): void;
+  onPointerUp(): void;
+  onPointerCancel(): void;
 }
 
 interface FileCardProps {
@@ -68,11 +68,11 @@ function FileCardComponent({ entry, position, supported, unsupportedReason, onRe
           ? t('{path}, position {position}. Alt+Arrow keys to reorder, Delete to remove.', { path: entry.path, position })
           : t('{path}. Alt+Arrow keys to reorder, Delete to remove.', { path: entry.path })
       }
-      draggable={drag.draggable}
-      onDragStart={drag.onDragStart}
-      onDragOver={drag.onDragOver}
-      onDragEnd={drag.onDragEnd}
-      onDrop={drag.onDrop}
+      data-reorder-index={drag.index}
+      onPointerDown={drag.onPointerDown}
+      onPointerMove={drag.onPointerMove}
+      onPointerUp={drag.onPointerUp}
+      onPointerCancel={drag.onPointerCancel}
       onKeyDown={onKeyDown}
     >
       <span className={styles.handle} aria-hidden="true">

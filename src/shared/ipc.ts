@@ -3,52 +3,22 @@ import type { MediaDetails, MediaFile, MediaKind } from './types/media';
 import type { AppEnvironment, Preset, Settings, SettingsPatch } from './types/settings';
 import type { OptionValues } from './operations/types';
 
-/** Every IPC channel name, shared by the main process and the preload bridge. */
-export const IPC = {
-  windowMinimize: 'window:minimize',
-  windowToggleMaximize: 'window:toggle-maximize',
-  windowClose: 'window:close',
-  windowIsMaximized: 'window:is-maximized',
-  windowMaximizedChanged: 'window:maximized-changed',
-  dialogOpenFiles: 'dialog:open-files',
-  dialogSelectFolder: 'dialog:select-folder',
-  shellShowInFolder: 'shell:show-in-folder',
-  shellOpenPath: 'shell:open-path',
-  mediaProbe: 'media:probe',
-  mediaThumbnail: 'media:thumbnail',
-  mediaDetails: 'media:details',
-  jobsStart: 'jobs:start',
-  jobsList: 'jobs:list',
-  jobsCancel: 'jobs:cancel',
-  jobsCancelAll: 'jobs:cancel-all',
-  jobsRetry: 'jobs:retry',
-  jobsRemove: 'jobs:remove',
-  jobsClearFinished: 'jobs:clear-finished',
-  jobsGetLog: 'jobs:get-log',
-  jobsEvent: 'jobs:event',
-  settingsGet: 'settings:get',
-  settingsUpdate: 'settings:update',
-  presetsSave: 'presets:save',
-  presetsDelete: 'presets:delete',
-  appEnvironment: 'app:environment',
-  themeSystemChanged: 'theme:system-changed',
-} as const;
-
-/**
- * Every `invoke` handler resolves to this envelope so user-facing error
- * messages reach the renderer unchanged (Electron rewrites thrown errors).
- */
-export type IpcResult<T> = { ok: true; value: T } | { ok: false; error: string };
-
 export interface OpenFilesRequest {
   title?: string;
   kinds: MediaKind[];
   multiple: boolean;
 }
 
+/** Files dragged from the OS over the window. Coordinates are CSS pixels in the viewport. */
+export type FileDragEvent =
+  { type: 'over'; x: number; y: number } | { type: 'drop'; x: number; y: number; paths: string[] } | { type: 'leave' };
+
 export type Unsubscribe = () => void;
 
-/** The API exposed to the renderer as `window.studio`. */
+/**
+ * Everything the UI may ask of the system. Implemented by `src/backend`, which
+ * is the only code that talks to Tauri and the Rust side.
+ */
 export interface StudioApi {
   window: {
     minimize(): void;
@@ -62,8 +32,8 @@ export interface StudioApi {
     selectFolder(defaultPath?: string | null): Promise<string | null>;
   };
   files: {
-    /** Resolves the absolute path of a dropped `File`. */
-    pathForFile(file: File): string;
+    /** OS file drags; the webview does not expose paths on HTML5 drop events. */
+    onDragDrop(callback: (event: FileDragEvent) => void): Unsubscribe;
     showInFolder(filePath: string): Promise<void>;
     openPath(filePath: string): Promise<void>;
   };

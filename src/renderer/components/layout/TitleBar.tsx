@@ -31,24 +31,21 @@ export function TitleBar(): React.JSX.Element {
   }, []);
 
   return (
-    <header
-      className={cx(styles.bar, isMac && styles.mac)}
-      onDoubleClick={(event) => event.target === event.currentTarget && studio.window.toggleMaximize()}
-    >
-      <div className={cx(styles.brand, styles.noDrag)}>
+    // Only elements carrying `data-tauri-drag-region` move the window; double-clicking them toggles maximize.
+    <header className={cx(styles.bar, isMac && styles.mac)} data-tauri-drag-region>
+      <div className={styles.brand}>
         <span className={styles.mark} aria-hidden="true">
           <AudioWaveform size={13} strokeWidth={2.25} />
         </span>
         FFmpeg Studio
       </div>
       <IconButton
-        className={styles.noDrag}
         icon={settings.sidebarCollapsed ? `Panel${start}Open` : `Panel${start}Close`}
         label={t('Toggle sidebar ({shortcut})', { shortcut: `${MOD_KEY}+B` })}
         onClick={() => update({ sidebarCollapsed: !settings.sidebarCollapsed })}
       />
-      <div className={styles.spacer} />
-      <div className={cx(styles.actions, styles.noDrag)}>
+      <div className={styles.spacer} data-tauri-drag-region />
+      <div className={styles.actions}>
         <IconButton
           icon={THEME_ICON[settings.theme]}
           label={t('Theme: {theme} (click to change)', { theme: t(THEME_LABEL[settings.theme]) })}
@@ -73,7 +70,7 @@ export function TitleBar(): React.JSX.Element {
         </div>
       </div>
       {!isMac && (
-        <div className={cx(styles.windowControls, styles.noDrag)}>
+        <div className={styles.windowControls}>
           <button type="button" className={styles.windowButton} aria-label={t('Minimize')} onClick={() => studio.window.minimize()}>
             <Minus size={15} strokeWidth={1.5} />
           </button>

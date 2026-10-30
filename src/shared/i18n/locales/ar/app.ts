@@ -3,7 +3,6 @@ import type { Catalog } from '../../types';
 /** Arabic strings for the app shell, messages and validation, keyed by their English source text. */
 const app: Catalog = {
   // Main process: binaries, FFmpeg failures, notifications
-  'The bundled {name} binary is not available for this platform.': 'ملف {name} المرفق غير متاح لهذا النظام.',
   'The bundled {name} binary is missing. Reinstall the app or run "npm install" again.':
     'ملف {name} المرفق مفقود. أعد تثبيت التطبيق أو شغّل "npm install" مرة أخرى.',
   'An input file could not be found. It may have been moved or deleted.': 'تعذّر العثور على أحد ملفات الإدخال. ربما نُقل أو حُذف.',
@@ -30,7 +29,6 @@ const app: Catalog = {
   '{count} cancelled or skipped': '{count} أُلغيت أو تم تخطيها',
 
   // Main process: requests, files, dialogs
-  'This request was blocked.': 'تم حظر هذا الطلب.',
   'Something went wrong. Details were written to the application log.': 'حدث خطأ ما. كُتبت التفاصيل في سجل التطبيق.',
   'Invalid {name}.': 'قيمة غير صالحة: {name}.',
   'File paths must be absolute.': 'يجب أن تكون مسارات الملفات مطلقة.',
@@ -64,7 +62,6 @@ const app: Catalog = {
 
   // Main process: queue and settings
   'Cancelled before starting.': 'أُلغيت قبل البدء.',
-  'FFmpeg is not available.': 'FFmpeg غير متاح.',
   'Cancelled.': 'أُلغيت.',
   'FFmpeg could not be started. The bundled binary may be blocked by security software.':
     'تعذّر تشغيل FFmpeg. ربما يحظر برنامج الحماية الملف المرفق.',

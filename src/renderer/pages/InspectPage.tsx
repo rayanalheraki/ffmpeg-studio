@@ -15,13 +15,13 @@ import styles from './Page.module.css';
 export function InspectPage({ operation }: { operation: AnyOperation }): React.JSX.Element {
   const { slots, remove } = useFiles();
   const { route, browse } = useAddFiles(operation, {});
-  const pageDrop = useFileDrop(route);
+  const { setZone: setPageZone } = useFileDrop(route);
   useHotkeys({ 'mod+o': () => browse() });
   const { t } = useI18n();
   const entries = slots[MAIN_SLOT] ?? [];
 
   return (
-    <div className={styles.page} {...pageDrop.handlers}>
+    <div className={styles.page} ref={setPageZone}>
       <div className={styles.scroll}>
         <header className={styles.header} style={{ maxWidth: 900 }}>
           <span className={styles.headerIcon}>

@@ -1,5 +1,4 @@
-import { useState, type DragEvent } from 'react';
-import { REORDER_MIME } from './useFileDrop';
+import { useRef, useState, type PointerEvent } from 'react';
 
 interface DragState {
   from: number;
@@ -7,39 +6,55 @@ interface DragState {
   position: 'before' | 'after';
 }
 
+/** Pixels the pointer must travel before a press becomes a drag, so clicks still work. */
+const DRAG_THRESHOLD = 5;
+const INTERACTIVE = 'button, a, input, select, textarea';
+
 /**
- * HTML5 drag-to-reorder for a vertical list. Internal drags use a private
- * MIME type so file drop zones ignore them.
+ * Pointer-driven drag-to-reorder for a vertical list. HTML5 drag & drop is not
+ * used because the webview reserves it for files dragged in from the OS.
  */
 export function useReorder(onMove: (from: number, to: number) => void) {
   const [state, setState] = useState<DragState | null>(null);
+  const press = useRef<{ index: number; x: number; y: number } | null>(null);
+
+  const reset = (): void => {
+    press.current = null;
+    setState(null);
+  };
 
   const itemProps = (index: number) => ({
-    draggable: true,
+    index,
     dragging: state?.from === index,
     dropPosition: state && state.over === index && state.from !== index ? state.position : null,
-    onDragStart: (event: DragEvent) => {
-      event.dataTransfer.effectAllowed = 'move';
-      event.dataTransfer.setData(REORDER_MIME, String(index));
-      setState({ from: index, over: index, position: 'before' });
+    onPointerDown: (event: PointerEvent<HTMLElement>) => {
+      if (event.button !== 0 || (event.target as HTMLElement).closest(INTERACTIVE)) return;
+      press.current = { index, x: event.clientX, y: event.clientY };
+      event.currentTarget.setPointerCapture(event.pointerId);
     },
-    onDragOver: (event: DragEvent) => {
-      if (!event.dataTransfer.types.includes(REORDER_MIME) || state == null) return;
-      event.preventDefault();
-      event.dataTransfer.dropEffect = 'move';
-      const rect = (event.currentTarget as HTMLElement).getBoundingClientRect();
+    onPointerMove: (event: PointerEvent<HTMLElement>) => {
+      const start = press.current;
+      if (!start) return;
+      if (state == null && Math.hypot(event.clientX - start.x, event.clientY - start.y) < DRAG_THRESHOLD) return;
+      const target = document.elementFromPoint(event.clientX, event.clientY)?.closest<HTMLElement>('[data-reorder-index]');
+      if (!target || target.parentElement !== event.currentTarget.parentElement) {
+        if (state == null) setState({ from: start.index, over: start.index, position: 'before' });
+        return;
+      }
+      const over = Number(target.dataset.reorderIndex);
+      const rect = target.getBoundingClientRect();
       const position = event.clientY < rect.top + rect.height / 2 ? 'before' : 'after';
-      if (state.over !== index || state.position !== position) setState({ ...state, over: index, position });
+      if (state?.over !== over || state.position !== position) setState({ from: start.index, over, position });
     },
-    onDrop: (event: DragEvent) => {
-      if (!event.dataTransfer.types.includes(REORDER_MIME) || state == null) return;
-      event.preventDefault();
-      const target = state.position === 'after' ? index + 1 : index;
-      const to = state.from < target ? target - 1 : target;
-      if (to !== state.from) onMove(state.from, to);
-      setState(null);
+    onPointerUp: () => {
+      if (state) {
+        const target = state.position === 'after' ? state.over + 1 : state.over;
+        const to = state.from < target ? target - 1 : target;
+        if (to !== state.from) onMove(state.from, to);
+      }
+      reset();
     },
-    onDragEnd: () => setState(null),
+    onPointerCancel: reset,
   });
 
   return { itemProps };

@@ -1,12 +1,12 @@
-import { mkdtempSync, writeFileSync } from 'node:fs';
+import { existsSync, mkdtempSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { describe, expect, it } from 'vitest';
-import { summarizeFailure } from '../../src/main/ffmpeg/errors';
-import { appendLog } from '../../src/main/ffmpeg/runner';
-import { parseFrameRate, toMediaFile } from '../../src/main/media/parse-probe';
-import { resolveOutputPath } from '../../src/main/queue/output-path';
-import { sanitizePatch } from '../../src/main/settings/sanitize';
+import { summarizeFailure } from '../../src/backend/ffmpeg/errors';
+import { appendLog } from '../../src/backend/ffmpeg/runner';
+import { parseFrameRate, toMediaFile } from '../../src/backend/media/parse-probe';
+import { resolveOutputPath } from '../../src/backend/queue/output-path';
+import { sanitizePatch } from '../../src/backend/settings/sanitize';
 
 describe('FFprobe parsing', () => {
   it('reads streams, ignores cover art as video and parses frame rates', () => {
@@ -53,16 +53,18 @@ describe('output collisions', () => {
   const existing = join(dir, 'clip.mp4');
   writeFileSync(existing, '');
 
-  it('renames, skips or overwrites existing files', () => {
-    expect(resolveOutputPath(existing, 'rename', new Set()).path).toBe(join(dir, 'clip (1).mp4'));
-    expect(resolveOutputPath(existing, 'skip', new Set()).skipReason).toMatch(/already exists/);
-    expect(resolveOutputPath(existing, 'overwrite', new Set())).toEqual({ path: existing, skipReason: null });
+  const exists = (filePath: string): Promise<boolean> => Promise.resolve(existsSync(filePath));
+
+  it('renames, skips or overwrites existing files', async () => {
+    expect((await resolveOutputPath(existing, 'rename', new Set(), exists)).path).toBe(join(dir, 'clip (1).mp4'));
+    expect((await resolveOutputPath(existing, 'skip', new Set(), exists)).skipReason).toMatch(/already exists/);
+    expect(await resolveOutputPath(existing, 'overwrite', new Set(), exists)).toEqual({ path: existing, skipReason: null });
   });
 
-  it('never lets two pending jobs share an output', () => {
+  it('never lets two pending jobs share an output', async () => {
     const planned = join(dir, 'new.mp4');
     const reserved = new Set([planned.toLowerCase()]);
-    expect(resolveOutputPath(planned, 'overwrite', reserved).path).toBe(join(dir, 'new (1).mp4'));
+    expect((await resolveOutputPath(planned, 'overwrite', reserved, exists)).path).toBe(join(dir, 'new (1).mp4'));
   });
 });
 

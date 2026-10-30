@@ -6,5 +6,5 @@
     "types": ["vite/client"],
     "tsBuildInfoFile": "./node_modules/.cache/tsconfig.web.tsbuildinfo"
   },
-  "include": ["src/renderer/**/*", "src/shared/**/*", "src/preload/index.d.ts"]
+  "include": ["src/renderer/**/*", "src/backend/**/*", "src/shared/**/*"]
 }

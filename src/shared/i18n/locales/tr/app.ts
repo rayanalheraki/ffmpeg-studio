@@ -6,7 +6,6 @@ import type { Catalog } from '../../types';
  */
 const app: Catalog = {
   // Main process: binaries, FFmpeg failures, notifications
-  'The bundled {name} binary is not available for this platform.': 'Paketlenmiş {name} programı bu platformda kullanılamıyor.',
   'The bundled {name} binary is missing. Reinstall the app or run "npm install" again.':
     'Paketlenmiş {name} programı eksik. Uygulamayı yeniden yükleyin veya "npm install" komutunu tekrar çalıştırın.',
   'An input file could not be found. It may have been moved or deleted.': 'Bir giriş dosyası bulunamadı. Taşınmış veya silinmiş olabilir.',
@@ -34,7 +33,6 @@ const app: Catalog = {
   '{count} cancelled or skipped': '{count} iptal edildi veya atlandı',
 
   // Main process: requests, files, dialogs
-  'This request was blocked.': 'Bu istek engellendi.',
   'Something went wrong. Details were written to the application log.': 'Bir sorun oluştu. Ayrıntılar uygulama günlüğüne yazıldı.',
   'Invalid {name}.': 'Geçersiz değer: {name}.',
   'File paths must be absolute.': 'Dosya yolları mutlak olmalıdır.',
@@ -63,7 +61,6 @@ const app: Catalog = {
 
   // Main process: queue and settings
   'Cancelled before starting.': 'Başlamadan önce iptal edildi.',
-  'FFmpeg is not available.': 'FFmpeg kullanılamıyor.',
   'Cancelled.': 'İptal edildi.',
   'FFmpeg could not be started. The bundled binary may be blocked by security software.':
     'FFmpeg başlatılamadı. Paketlenmiş program güvenlik yazılımı tarafından engelleniyor olabilir.',

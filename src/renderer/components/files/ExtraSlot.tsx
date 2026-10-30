@@ -22,12 +22,12 @@ export function ExtraSlot({ slot, options, onBrowse }: ExtraSlotProps): React.JS
   const { slots, addPaths, remove } = useFiles();
   const { t } = useI18n();
   const entries = slots[slot.id] ?? [];
-  const { active, handlers } = useFileDrop((paths) => addPaths(slot.id, slot.multiple ? paths : paths.slice(0, 1), !slot.multiple));
+  const { active, setZone } = useFileDrop((paths) => addPaths(slot.id, slot.multiple ? paths : paths.slice(0, 1), !slot.multiple));
   const required = isSlotRequired(slot, options);
   const icon = SLOT_ICONS[slot.accept[0] ?? 'unknown'];
 
   return (
-    <section className={cx(styles.slot, active && styles.active)} aria-label={t(slot.label)} {...handlers}>
+    <section className={cx(styles.slot, active && styles.active)} aria-label={t(slot.label)} ref={setZone}>
       <div className={styles.header}>
         <span className={styles.icon}>
           <Icon name={icon} size={15} />
