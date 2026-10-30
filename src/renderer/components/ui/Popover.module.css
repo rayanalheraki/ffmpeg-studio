@@ -1,0 +1,9 @@
+.panel {
+  z-index: var(--z-popover);
+  overflow-y: auto;
+  padding: var(--space-4);
+  border-radius: var(--radius-lg);
+  background: var(--surface-raised);
+  box-shadow: var(--shadow-lg);
+  animation: rise-in var(--duration-base) var(--ease-out);
+}

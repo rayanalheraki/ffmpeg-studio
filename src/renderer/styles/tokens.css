@@ -1,0 +1,156 @@
+/*
+ * Design tokens. Every color, size, radius and timing used by components
+ * comes from here. Themes only redefine the color tokens.
+ */
+:root {
+  --font-sans: 'Inter Variable', 'Inter', ui-sans-serif, system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --font-mono: ui-monospace, 'SF Mono', 'Cascadia Code', 'JetBrains Mono', Consolas, monospace;
+
+  /* 4/8px spacing scale */
+  --space-0-5: 2px;
+  --space-1: 4px;
+  --space-1-5: 6px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 20px;
+  --space-6: 24px;
+  --space-8: 32px;
+  --space-10: 40px;
+  --space-12: 48px;
+  --space-16: 64px;
+
+  --text-2xs: 10.5px;
+  --text-xs: 11.5px;
+  --text-sm: 12.5px;
+  --text-md: 13.5px;
+  --text-lg: 15px;
+  --text-xl: 18px;
+  --text-2xl: 22px;
+  --weight-regular: 420;
+  --weight-medium: 520;
+  --weight-semibold: 600;
+  --leading-tight: 1.25;
+  --leading-normal: 1.5;
+  --tracking-tight: -0.011em;
+  --tracking-wide: 0.04em;
+
+  --radius-xs: 4px;
+  --radius-sm: 6px;
+  --radius-md: 8px;
+  --radius-lg: 12px;
+  --radius-xl: 16px;
+  --radius-full: 999px;
+
+  --duration-fast: 150ms;
+  --duration-base: 200ms;
+  --duration-slow: 250ms;
+  --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
+  --ease-in-out: cubic-bezier(0.65, 0, 0.35, 1);
+
+  --titlebar-height: 44px;
+  --sidebar-width: 244px;
+  --sidebar-collapsed-width: 60px;
+  --queue-width: 360px;
+  --footer-height: 64px;
+  --control-height: 34px;
+  --control-height-sm: 28px;
+
+  --z-sticky: 10;
+  --z-overlay: 50;
+  --z-popover: 100;
+  --z-dialog: 200;
+  --z-toast: 300;
+}
+
+:root,
+[data-theme='dark'] {
+  color-scheme: dark;
+  --bg: #0d0e11;
+  --bg-sunken: #0a0b0d;
+  --surface: #141519;
+  --surface-raised: #1a1b20;
+  --surface-hover: #202128;
+  --surface-active: #25262e;
+  --border: rgb(255 255 255 / 0.065);
+  --border-strong: rgb(255 255 255 / 0.11);
+  --border-focus: rgb(140 126 255 / 0.65);
+
+  --text: #ededf0;
+  --text-secondary: #a3a4ae;
+  --text-tertiary: #6d6e79;
+  --text-disabled: #4b4c55;
+
+  --accent: #7d6dff;
+  --accent-hover: #8e80ff;
+  --accent-pressed: #6c5cf0;
+  --accent-soft: rgb(125 109 255 / 0.14);
+  --accent-soft-strong: rgb(125 109 255 / 0.24);
+  --accent-text: #b7aeff;
+  --on-accent: #ffffff;
+
+  --success: #3dd68c;
+  --success-soft: rgb(61 214 140 / 0.13);
+  --warning: #f5b544;
+  --warning-soft: rgb(245 181 68 / 0.13);
+  --danger: #f2626b;
+  --danger-soft: rgb(242 98 107 / 0.13);
+  --info: #5eb4ff;
+  --info-soft: rgb(94 180 255 / 0.13);
+
+  --shadow-sm: 0 1px 2px rgb(0 0 0 / 0.35);
+  --shadow-md: 0 4px 16px -4px rgb(0 0 0 / 0.5), 0 0 0 1px var(--border);
+  --shadow-lg: 0 16px 48px -12px rgb(0 0 0 / 0.65), 0 0 0 1px var(--border-strong);
+  --focus-ring: 0 0 0 2px var(--bg), 0 0 0 4px var(--border-focus);
+  --scrim: rgb(5 6 8 / 0.6);
+  --glow: radial-gradient(60% 80% at 50% 0%, rgb(125 109 255 / 0.12), transparent 70%);
+}
+
+[data-theme='light'] {
+  color-scheme: light;
+  --bg: #f6f6f7;
+  --bg-sunken: #efeff1;
+  --surface: #ffffff;
+  --surface-raised: #ffffff;
+  --surface-hover: #f1f1f3;
+  --surface-active: #e9e9ec;
+  --border: rgb(15 16 20 / 0.08);
+  --border-strong: rgb(15 16 20 / 0.14);
+  --border-focus: rgb(96 79 240 / 0.55);
+
+  --text: #16171b;
+  --text-secondary: #5b5c66;
+  --text-tertiary: #8b8c96;
+  --text-disabled: #b4b5bd;
+
+  --accent: #6553f0;
+  --accent-hover: #5745e6;
+  --accent-pressed: #4b3ad6;
+  --accent-soft: rgb(101 83 240 / 0.1);
+  --accent-soft-strong: rgb(101 83 240 / 0.18);
+  --accent-text: #5040d8;
+  --on-accent: #ffffff;
+
+  --success: #12a160;
+  --success-soft: rgb(18 161 96 / 0.1);
+  --warning: #c27a06;
+  --warning-soft: rgb(194 122 6 / 0.1);
+  --danger: #d93a44;
+  --danger-soft: rgb(217 58 68 / 0.09);
+  --info: #1f7ed6;
+  --info-soft: rgb(31 126 214 / 0.1);
+
+  --shadow-sm: 0 1px 2px rgb(15 16 20 / 0.06);
+  --shadow-md: 0 4px 16px -4px rgb(15 16 20 / 0.12), 0 0 0 1px var(--border);
+  --shadow-lg: 0 16px 48px -12px rgb(15 16 20 / 0.22), 0 0 0 1px var(--border-strong);
+  --scrim: rgb(240 240 243 / 0.65);
+  --glow: radial-gradient(60% 80% at 50% 0%, rgb(101 83 240 / 0.08), transparent 70%);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  :root {
+    --duration-fast: 0ms;
+    --duration-base: 0ms;
+    --duration-slow: 0ms;
+  }
+}
